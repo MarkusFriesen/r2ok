@@ -19,7 +19,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "deploy": "cp ./build ../server/public -r"
+    "deploy": "rm -r ..\\server\\public && cp -r ./build ../server/public",
+    "deployW": "(if exist \"..\\server\\public\" rmdir ..\\server\\public /Q/S) && xcopy build ..\\server\\public /E/I/Y/Q"
   },
   "eslintConfig": {
     "extends": [

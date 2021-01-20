@@ -14,8 +14,8 @@ The Ready2Order Kitchen uses the Ready2Order API to select all orders and displa
 In `src/client`:
 
 1. `npm i`
-2. `npm build`
-3. `npm deploy`
+2. `npm run build`
+3. `npm run deploy`
 
 ## Run
 
