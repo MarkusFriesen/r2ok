@@ -1,28 +1,20 @@
 const express = require('express')
 const startOrderSynchonization = require('./synchronizer.js')
 const app = express()
-const port = 8080
-const orders = require('./orders.js')
+const routes = require('./routes')
+const config = require('./config')
+const path = require('path')
 
-app.get('/orders', (_, res) => {
-  res.send(orders)
-})
+routes(app)
 
-app.post('/orders/:tableId/:orderId/toggleMade', (req, res) => {
-  const { tableId, orderId} = req.params
+app.use(express.static(path.join(__dirname + '/public')))
 
-  if (!orders[tableId] || !orders[tableId].orders[orderId]){
-    res.status(404).send()
-    return
-  }
+app.get('/', (_, res) => {
+  res.sendFile(path.join(__dirname + '/public/index.html'));
+});
 
-  orders[tableId].orders[orderId].made = !orders[tableId].orders[orderId].made
-  res.status(200).send()
-  return
-})
-
-app.listen(port, () => {
-  console.log(`App listening at http://localhost:${port}`)
+app.listen(config.port, () => {
+  console.log(`App listening at http://localhost:${config.port}`)
 })
 
 startOrderSynchonization()
