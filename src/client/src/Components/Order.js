@@ -16,14 +16,17 @@ import { post } from 'axios'
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    width: '100%',
     margin: 15
+  },
+  card: {
+    width: '100%',
   },
   avatar: {
     backgroundColor: red[500],
   },
 }));
 
+const dateOptions = { month: 'long', day: 'numeric'};
 
 export default function Order(props) {
   const classes = useStyles();
@@ -59,21 +62,24 @@ export default function Order(props) {
   }
 
   return (
-    <Card className={classes.root}>
-      <CardHeader
-        avatar={
-          <Avatar aria-label="table" className={classes.avatar}>
-            <EmojiFoodBeverageIcon />
-          </Avatar>
-        }
-        title={name}
-        subheader={`${timestamp.toLocaleDateString()} ${timestamp.toLocaleTimeString()}`}
-      />
-      <CardContent>
-        <List >
-          {items}
-        </List>
-      </CardContent>
-    </Card>
+    <div className={classes.root}>
+      <Card className={classes.card}>
+        <CardHeader
+          avatar={
+            <Avatar aria-label="table" className={classes.avatar}>
+              <EmojiFoodBeverageIcon />
+            </Avatar>
+          }
+          title={name}
+          subheader={`${timestamp.toLocaleDateString(undefined, dateOptions)} ${timestamp.toLocaleTimeString()}`}
+        />
+        <CardContent>
+          <List >
+            {items}
+          </List>
+        </CardContent>
+      </Card>
+    </div>
+    
   );
 }
