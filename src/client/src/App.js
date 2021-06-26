@@ -6,8 +6,9 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import AppBar from '@material-ui/core/AppBar';
 import IconButton from '@material-ui/core/IconButton'; 
-import SelectAllIcon  from '@material-ui/icons/SelectAll';
-import TabUnselectedIcon from '@material-ui/icons/TabUnselected';
+import FilterIcon from '@material-ui/icons/FilterList';
+import Badge from '@material-ui/core/Badge';
+import FilterDialog from './Components/FilterDialog';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -29,8 +30,8 @@ const useStyles = makeStyles((theme) => ({
 function App() {
   const classes = useStyles();
   const [showAll, setShowAll] = useState(false)
+  const [dialogOpen, setDialogOpen] = useState(false)
 
-  const icon = showAll ? <TabUnselectedIcon /> : <SelectAllIcon />
   return (
     <ThemeProvider theme={Theme}>
       <AppBar position="static">
@@ -39,11 +40,14 @@ function App() {
             Ready2Order Kitchen
           </Typography>
 
-          <IconButton color="inherit" onClick={() => setShowAll(!showAll)}>
-            {icon}
+          <IconButton color="inherit" onClick={() => setDialogOpen(true)}>
+            <Badge color="secondary" variant="dot" invisible={!showAll}>
+              <FilterIcon />
+            </Badge>
           </IconButton>
         </Toolbar>
       </AppBar>
+      <FilterDialog showAll={showAll} setShowAll={setShowAll} open={dialogOpen} onClose={() => setDialogOpen(false)} />
       <OrderPage showAll={showAll}/>
     </ThemeProvider>
   );
