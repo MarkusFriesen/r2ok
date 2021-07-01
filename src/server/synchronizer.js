@@ -12,22 +12,29 @@ const instance = axios.create({
   }
 });
 
-// Fetch all Orders every 5 seconds, and overwrite them
-const job = new CronJob('*/5 * * * * *', async () => {
-  instance.get('orders')
-    .then((response) => {
-      const {status, data} = response
+var locked = false
 
-      if (status !== 200) {
-        winston.warn(`[synchronizer] Couldn't get order data. Status: ${status}. Data:`, data);
-        return
-      }
+// Fetch all orders every 10 seconds, and overwrite them
+const job = new CronJob('*/10 * * * * *', async () => {
 
-      updateOrders(data)
-    })
-    .catch((error) => {
-      winston.error('[synchronizer] Error getting orders', error);
-    })
+  // lock api calls to disable concurrent calls
+  if (locked) return
+  locked = true
+
+  try {
+    var {status, data} = await instance.get('orders')
+    locked = false
+
+    if (status !== 200) {
+      winston.warn(`[synchronizer] Couldn't get order data. Status: ${status}. Data:`, data);
+      return
+    }
+
+    updateOrders(data)
+  } catch (exception) {
+    locked = false
+    winston.error('[synchronizer] Error getting orders', exception);
+  }
 })
 
 const getTableInformation = () => {
