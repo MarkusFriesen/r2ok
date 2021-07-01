@@ -45,7 +45,7 @@ export default function ConfirmationDialog(props) {
               name="Show drinks"
             />
           }
-          label="Show Drinks"
+          label="Show drinks"
         />
         <br />
         <FormControlLabel
@@ -56,7 +56,7 @@ export default function ConfirmationDialog(props) {
               name="Show food"
             />
           }
-          label="Show Food"
+          label="Show food"
         />
       </DialogContent>
       <DialogActions>
