@@ -11,11 +11,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function OrderPage(props) {
+export default function OrderPage({showAll, showFood, showDrinks}) {
   const classes = useStyles();
   const [tables, setTables] = useState({})
   const [refreshTimeStamp, setRefreshTimestamp] = useState(new Date())
-  const {showAll} = props
 
   useEffect(() => {
     let disposed = false
@@ -33,6 +32,23 @@ export default function OrderPage(props) {
         const allOrders = Object.values(data[table].orders)
         if (allOrders?.length > 0 && (showAll || !allOrders.every(o => o.made))) {
           result[table] = data[table]
+
+          // Apply Filter
+          for (const orderId in result[table].orders) {
+            const order = result[table].orders[orderId]
+            switch (order.groupType) {
+              case 1:
+                if (!showFood)
+                  delete result[table].orders[orderId]
+                break;
+              case 2:
+                if (!showDrinks)
+                  delete result[table].orders[orderId]
+                break;
+              default:
+                break;
+            }
+          }
         }
       }
       setTables(result)
@@ -48,7 +64,7 @@ export default function OrderPage(props) {
       disposed = true
       clearInterval(intervalId)
     }
-  }, [showAll, refreshTimeStamp])
+  }, [showAll, showDrinks, showFood, refreshTimeStamp])
 
 
   var content = []

@@ -8,14 +8,14 @@ import Checkbox from '@material-ui/core/Checkbox';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 
 export default function ConfirmationDialog(props) {
-  const {onClose, showAll, setShowAll, open} = props;
+  const {onClose, showAll, setShowAll, showDrinks, setShowDrinks, showFood, setShowFood, open} = props;
 
   const handleOk = () => {
     onClose();
   };
 
-  const handleChange = (event) => {
-    setShowAll(event.target.checked);
+  const handleChange = setter => (event) => {
+    setter(event.target.checked);
   };
 
   return (
@@ -30,11 +30,33 @@ export default function ConfirmationDialog(props) {
           control={
             <Checkbox
               checked={showAll}
-              onChange={handleChange}
+              onChange={handleChange(setShowAll)}
               name="showAll"
             />
           }
           label="Show fulfilled orders"
+        />
+        <br/>
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={showDrinks}
+              onChange={handleChange(setShowDrinks)}
+              name="Show drinks"
+            />
+          }
+          label="Show Drinks"
+        />
+        <br />
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={showFood}
+              onChange={handleChange(setShowFood)}
+              name="Show food"
+            />
+          }
+          label="Show Food"
         />
       </DialogContent>
       <DialogActions>

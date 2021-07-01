@@ -9,6 +9,7 @@ const updateOrders = (data) => {
       number: order.order_number,
       quantity: order.order_quantity,
       created: order.order_created_at,
+      groupType: order.productgroup_type_id,
       updated: true
     }
 

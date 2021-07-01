@@ -30,6 +30,8 @@ const useStyles = makeStyles((theme) => ({
 function App() {
   const classes = useStyles();
   const [showAll, setShowAll] = useState(false)
+  const [showFood, setShowFood] = useState(true)
+  const [showDrinks, setShowDrinks] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
 
   return (
@@ -41,14 +43,14 @@ function App() {
           </Typography>
 
           <IconButton color="inherit" onClick={() => setDialogOpen(true)}>
-            <Badge color="secondary" variant="dot" invisible={!showAll}>
+            <Badge color="secondary" variant="dot" invisible={!showAll && showDrinks && showFood}>
               <FilterIcon />
             </Badge>
           </IconButton>
         </Toolbar>
       </AppBar>
-      <FilterDialog showAll={showAll} setShowAll={setShowAll} open={dialogOpen} onClose={() => setDialogOpen(false)} />
-      <OrderPage showAll={showAll}/>
+      <FilterDialog showAll={showAll} setShowAll={setShowAll} showFood={showFood} setShowFood={setShowFood} showDrinks={showDrinks} setShowDrinks={setShowDrinks} open={dialogOpen} onClose={() => setDialogOpen(false)} />
+      <OrderPage showAll={showAll} showFood={showFood} showDrinks={showDrinks}/>
     </ThemeProvider>
   );
 }
