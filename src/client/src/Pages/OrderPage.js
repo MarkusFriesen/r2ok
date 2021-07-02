@@ -11,7 +11,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function OrderPage({showAll, showFood, showDrinks}) {
+export default function OrderPage({dontShowAll, showFood, showDrinks}) {
   const classes = useStyles();
   const [tables, setTables] = useState({})
   const [refreshTimeStamp, setRefreshTimestamp] = useState(new Date())
@@ -30,7 +30,7 @@ export default function OrderPage({showAll, showFood, showDrinks}) {
       const result = {}
       for (const table in data) {
         const allOrders = Object.values(data[table].orders)
-        if (allOrders?.length > 0 && (showAll || !allOrders.every(o => o.made))) {
+        if (allOrders?.length > 0 && (!dontShowAll || !allOrders.every(o => o.made))) {
           result[table] = data[table]
 
           // Apply Filter
@@ -64,7 +64,7 @@ export default function OrderPage({showAll, showFood, showDrinks}) {
       disposed = true
       clearInterval(intervalId)
     }
-  }, [showAll, showDrinks, showFood, refreshTimeStamp])
+  }, [dontShowAll, showDrinks, showFood, refreshTimeStamp])
 
 
   var content = []

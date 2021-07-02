@@ -8,7 +8,7 @@ import Checkbox from '@material-ui/core/Checkbox';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 
 export default function ConfirmationDialog(props) {
-  const {onClose, showAll, setShowAll, showDrinks, setShowDrinks, showFood, setShowFood, open} = props;
+  const {onClose, dontShowAll, setDontShowAll, showDrinks, setShowDrinks, showFood, setShowFood, open} = props;
 
   const handleOk = () => {
     onClose();
@@ -29,12 +29,12 @@ export default function ConfirmationDialog(props) {
         <FormControlLabel
           control={
             <Checkbox
-              checked={showAll}
-              onChange={handleChange(setShowAll)}
+              checked={dontShowAll}
+              onChange={handleChange(setDontShowAll)}
               name="showAll"
             />
           }
-          label="Show fulfilled orders"
+          label="Don't show fulfilled orders"
         />
         <br/>
         <FormControlLabel

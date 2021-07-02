@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme) => ({
 
 function App() {
   const classes = useStyles();
-  const [showAll, setShowAll] = useState(false)
+  const [dontShowAll, setDontShowAll] = useState(true)
   const [showFood, setShowFood] = useState(true)
   const [showDrinks, setShowDrinks] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -43,14 +43,14 @@ function App() {
           </Typography>
 
           <IconButton color="inherit" onClick={() => setDialogOpen(true)}>
-            <Badge color="secondary" variant="dot" invisible={!showAll && showDrinks && showFood}>
+            <Badge color="secondary" variant="dot" invisible={dontShowAll && showDrinks && showFood}>
               <FilterIcon />
             </Badge>
           </IconButton>
         </Toolbar>
       </AppBar>
-      <FilterDialog showAll={showAll} setShowAll={setShowAll} showFood={showFood} setShowFood={setShowFood} showDrinks={showDrinks} setShowDrinks={setShowDrinks} open={dialogOpen} onClose={() => setDialogOpen(false)} />
-      <OrderPage showAll={showAll} showFood={showFood} showDrinks={showDrinks}/>
+      <FilterDialog dontShowAll={dontShowAll} setDontShowAll={setDontShowAll} showFood={showFood} setShowFood={setShowFood} showDrinks={showDrinks} setShowDrinks={setShowDrinks} open={dialogOpen} onClose={() => setDialogOpen(false)} />
+      <OrderPage dontShowAll={dontShowAll} showFood={showFood} showDrinks={showDrinks}/>
     </ThemeProvider>
   );
 }
