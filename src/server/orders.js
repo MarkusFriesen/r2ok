@@ -1,4 +1,9 @@
-const orders = {}
+const fs = require('fs');
+const config = require('./config')
+const winston = require('winston')
+
+let orders = {}
+let initialized = false
 
 const updateOrders = (data) => {
   data.forEach(order => {
@@ -16,8 +21,25 @@ const updateOrders = (data) => {
     orders[order.table_id].updated = true
   })
 
-
   deleteStaleOrders()
+}
+
+const persistOrders = () => {
+  fs.writeFile(config.storage.filePath, JSON.stringify(orders), (err) => {
+    if (!err) return 
+    winston.error('[orders] Failed to save state to file', err);
+  });
+}
+
+const rehydrateOrders = () => {
+  if (initialized) return
+  try {
+    orders = JSON.parse(fs.readFileSync(config.storage.filePath));
+    initialized = true
+  } catch (err){
+    winston.error('[orders] Failed to rehydrate orders', err);
+    return;
+  }
 }
 
 const deleteStaleOrders = () => {
@@ -42,7 +64,7 @@ const deleteStaleOrders = () => {
 
 const initializeTables = (data) => {
   data.forEach(t => {
-    orders[t.table_id] = {name: t.table_name, orders: {}, updated: false}
+    orders[t.table_id] = {name: t.table_name, orders: orders[t.table_id]?.orders ?? {}, updated: false}
   })
 }
 
@@ -52,6 +74,8 @@ const toggleOrder = (tableId, orderId) => {
   }
 
   orders[tableId].orders[orderId].made = !orders[tableId].orders[orderId].made
+
+  persistOrders()
   return true
 }
 
@@ -61,5 +85,6 @@ module.exports = {
   toggleOrder, 
   initializeTables,
   updateOrders,
-  getOrders
+  getOrders,
+  rehydrateOrders
 }

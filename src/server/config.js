@@ -6,6 +6,9 @@ const config = {
     dirname: ".",
     maxsize: "5242880",
     maxFiles: 3
+  },
+  storage: {
+    filePath: './data/orderStorage.json'
   }
 }
 module.exports = config

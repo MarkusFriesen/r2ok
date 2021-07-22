@@ -1,8 +1,8 @@
 const axios = require('axios')
 const CronJob = require('cron').CronJob;
-const {updateOrders, initializeTables} = require('./orders.js')
+const {updateOrders, initializeTables, rehydrateOrders} = require('./orders.js')
 const config = require('./config.js')
-const winston = require('winston');
+const winston = require('winston')
 
 const instance = axios.create({
   baseURL: 'https://api.ready2order.com/v1/',
@@ -65,6 +65,7 @@ const getTableInformation = () => {
 
 const startOrderSynchonization = () => {
   winston.info('[synchronizer] Staring order synchronization')
+  rehydrateOrders()
   getTableInformation().then(() => {
     job.start()
   })

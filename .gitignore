@@ -27,3 +27,6 @@ yarn-error.log*
 
 #logger files
 combined.log
+
+# locally stored data
+data/orderStorage.json
