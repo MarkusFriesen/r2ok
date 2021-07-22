@@ -10,30 +10,35 @@ const instance = axios.create({
   headers: {
     'Authorization': config.authorizationKey
   }
-});
+})
 
 var locked = false
 
-// Fetch all orders every 10 seconds, and overwrite them
-const job = new CronJob('*/10 * * * * *', async () => {
+// Fetch all orders every 15 seconds, and overwrite them
+const job = new CronJob('*/15 * * * * *', async () => {
 
   // lock api calls to disable concurrent calls
   if (locked) return
   locked = true
 
   try {
-    var {status, data} = await instance.get('orders?limit=9999')
+    let allData = []
+    let page = 1
+
+    do {
+      var {status, data} = await instance.get(`orders?page=${page++}&limit=999`)
+      if (status !== 200) {
+        winston.warn(`[synchronizer] Couldn't get order data. Status: ${status}. Data:`, data)
+        return
+      }
+      allData = [...allData, ...data]
+    } while (data && data.length === 999)
     locked = false
 
-    if (status !== 200) {
-      winston.warn(`[synchronizer] Couldn't get order data. Status: ${status}. Data:`, data);
-      return
-    }
-
-    updateOrders(data)
+    updateOrders(allData)
   } catch (exception) {
     locked = false
-    winston.error('[synchronizer] Error getting orders', exception);
+    winston.error('[synchronizer] Error getting orders', exception)
   }
 })
 
@@ -43,7 +48,7 @@ const getTableInformation = () => {
       .then((response) => {
         const {status, data} = response
         if (status !== 200) {
-          winston.error(`[synchronizer] Couldn't get table data. Status: ${status}. Data:`, data);
+          winston.error(`[synchronizer] Couldn't get table data. Status: ${status}. Data:`, data)
           return
         }
 
