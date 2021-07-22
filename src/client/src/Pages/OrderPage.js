@@ -29,25 +29,30 @@ export default function OrderPage({dontShowAll, showFood, showDrinks}) {
 
       const result = {}
       for (const table in data) {
-        const allOrders = Object.values(data[table].orders)
-        if (allOrders?.length > 0 && (!dontShowAll || !allOrders.every(o => o.made))) {
-          result[table] = data[table]
+        let allOrders = Object.values(data[table].orders)
+        if (allOrders?.length > 0) {
 
           // Apply Filter
-          for (const orderId in result[table].orders) {
-            const order = result[table].orders[orderId]
+          for (const orderId in data[table].orders) {
+            const order = data[table].orders[orderId]
             switch (order.groupType) {
               case 1:
                 if (!showFood)
-                  delete result[table].orders[orderId]
+                  delete data[table].orders[orderId]
                 break;
               case 2:
                 if (!showDrinks)
-                  delete result[table].orders[orderId]
+                  delete data[table].orders[orderId]
                 break;
               default:
                 break;
             }
+          }
+
+          allOrders = Object.values(data[table].orders)
+
+          if ((!dontShowAll || !allOrders.every(o => o.made))) {
+            result[table] = data[table]
           }
         }
       }
