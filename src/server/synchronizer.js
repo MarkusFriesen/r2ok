@@ -22,7 +22,7 @@ const job = new CronJob('*/10 * * * * *', async () => {
   locked = true
 
   try {
-    var {status, data} = await instance.get('orders')
+    var {status, data} = await instance.get('orders?limit=9999')
     locked = false
 
     if (status !== 200) {
