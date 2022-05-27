@@ -37,9 +37,10 @@ export default function OrderPage({dontShowAll, showFood, showDrinks}) {
   }
 
   useEffect(() => {
+    if (!initialized || numOfOrders < 1) return
+    
     setSnackbarMessage("No orders available")
     setOpenSnackbar(true)
-    if (!initialized || numOfOrders < 1) return
 
   }, [numOfOrders, initialized])
 
