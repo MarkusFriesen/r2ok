@@ -1,6 +1,6 @@
 const axios = require('axios')
 const CronJob = require('cron').CronJob;
-const {updateOrders, initializeTables, rehydrateOrders} = require('./orders.js')
+const {updateOrders, initializeTables, rehydrateOrders, setLastError} = require('./orders.js')
 const config = require('./config.js')
 const winston = require('winston')
 
@@ -28,6 +28,7 @@ const job = new CronJob('*/15 * * * * *', async () => {
     do {
       var {status, data} = await instance.get(`orders?page=${page++}&limit=999`)
       if (status !== 200) {
+        setLastError(new Date(), status, data)
         winston.warn(`[synchronizer] Couldn't get order data. Status: ${status}. Data:`, data)
         return
       }
@@ -38,6 +39,8 @@ const job = new CronJob('*/15 * * * * *', async () => {
     updateOrders(allData)
   } catch (exception) {
     locked = false
+
+    setLastError(new Date(), 500, exception)
     winston.error('[synchronizer] Error getting orders', exception)
   }
 })

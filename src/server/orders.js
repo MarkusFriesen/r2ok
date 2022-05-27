@@ -81,10 +81,17 @@ const toggleOrder = (tableId, orderId) => {
 
 const getOrders = () => { return { ...orders } } 
 
+let lastError = {}
+
+const getLastError = () => lastError
+const setLastError = (date, code, error) => lastError = {date, error, code}
+
 module.exports = {
   toggleOrder, 
   initializeTables,
   updateOrders,
   getOrders,
-  rehydrateOrders
+  rehydrateOrders,
+  getLastError,
+  setLastError
 }

@@ -1,4 +1,4 @@
-const {toggleOrder, getOrders } = require('./orders')
+const {toggleOrder, getOrders, getLastError } = require('./orders')
 module.exports = function (app) {
   app.get('/orders', (_, res) => {
     res.send(getOrders())
@@ -13,5 +13,9 @@ module.exports = function (app) {
     }
 
     res.status(200).send()
+  })
+
+  app.get('/lasterror', (_, res) => {
+    res.send(getLastError())
   })
 }

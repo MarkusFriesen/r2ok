@@ -5,7 +5,7 @@ import OrderPage from './Pages/OrderPage';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import AppBar from '@material-ui/core/AppBar';
-import IconButton from '@material-ui/core/IconButton'; 
+import IconButton from '@material-ui/core/IconButton';
 import FilterIcon from '@material-ui/icons/FilterList';
 import Badge from '@material-ui/core/Badge';
 import FilterDialog from './Components/FilterDialog';
@@ -43,14 +43,14 @@ function App() {
           </Typography>
 
           <IconButton color="inherit" onClick={() => setDialogOpen(true)}>
-            <Badge color="secondary" variant="dot" invisible={dontShowAll && showDrinks && showFood}>
+            <Badge color="secondary" variant="dot" overlap="rectangular" invisible={dontShowAll && showDrinks && showFood}>
               <FilterIcon />
             </Badge>
           </IconButton>
         </Toolbar>
       </AppBar>
       <FilterDialog dontShowAll={dontShowAll} setDontShowAll={setDontShowAll} showFood={showFood} setShowFood={setShowFood} showDrinks={showDrinks} setShowDrinks={setShowDrinks} open={dialogOpen} onClose={() => setDialogOpen(false)} />
-      <OrderPage dontShowAll={dontShowAll} showFood={showFood} showDrinks={showDrinks}/>
+      <OrderPage dontShowAll={dontShowAll} showFood={showFood} showDrinks={showDrinks} />
     </ThemeProvider>
   );
 }
