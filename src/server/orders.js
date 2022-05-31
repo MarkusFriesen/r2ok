@@ -3,6 +3,7 @@ const config = require('./config')
 const winston = require('winston')
 
 let orders = {}
+let productsToProductGroup = {}
 let initialized = false
 
 const updateOrders = (data) => {
@@ -15,7 +16,8 @@ const updateOrders = (data) => {
       quantity: order.order_quantity,
       created: order.order_created_at,
       groupType: order.productgroup_type_id,
-      updated: true
+      updated: true,
+      productId: order.product_id
     }
 
     orders[order.table_id].updated = true
@@ -68,6 +70,12 @@ const initializeTables = (data) => {
   })
 }
 
+const initializeProducts = (data) => {
+  data.forEach(product => {
+    productsToProductGroup[product.product_id] = {name: product.productgroup.productgroup_name, id: product.productgroup.productgroup_id}
+  });
+}
+
 const toggleOrder = (tableId, orderId) => {
   if (!orders[tableId] || !orders[tableId].orders[orderId]) {
     return false
@@ -81,6 +89,8 @@ const toggleOrder = (tableId, orderId) => {
 
 const getOrders = () => { return { ...orders } } 
 
+const getProductsToProductGroup = () => productsToProductGroup
+
 let lastError = {}
 
 const getLastError = () => lastError
@@ -93,5 +103,7 @@ module.exports = {
   getOrders,
   rehydrateOrders,
   getLastError,
-  setLastError
+  setLastError,
+  initializeProducts,
+  getProductsToProductGroup
 }

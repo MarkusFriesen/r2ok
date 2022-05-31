@@ -1,6 +1,6 @@
 const axios = require('axios')
 const CronJob = require('cron').CronJob;
-const {updateOrders, initializeTables, rehydrateOrders, setLastError} = require('./orders.js')
+const {updateOrders, initializeTables, rehydrateOrders, setLastError, initializeProducts} = require('./orders.js')
 const config = require('./config.js')
 const winston = require('winston')
 
@@ -66,11 +66,36 @@ const getTableInformation = () => {
   })
 }
 
+const getProductInformation = () => {
+  return new Promise((resolve, reject) => {
+    instance.get('products?includeProductGroup=true')
+    .then((response) => {
+      const {status, data} = response
+      
+      if (status !== 200) {
+        winston.error(`[synchronizer] Couldn't get product data. Status: ${status}. Data:`, data)
+        return
+      }
+
+      initializeProducts(data)
+
+      resolve()
+    })
+      .catch((error) => {
+        winston.error('[synchronizer] Error getting product information', error)
+        reject(error)
+      })
+  })
+}
+
 const startOrderSynchonization = () => {
   winston.info('[synchronizer] Staring order synchronization')
   rehydrateOrders()
   getTableInformation().then(() => {
-    job.start()
+    getProductInformation().then(
+      () => {
+        job.start()
+      })
   })
 }
 

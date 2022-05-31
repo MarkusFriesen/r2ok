@@ -14,34 +14,60 @@ function sortTables(a, b) {
   else return -1
 }
 
-function FilterData(data, table, showFood, showDrinks) {
-  const allOrders = []
-  let firstCreated;
-  for (const orderId in data[table].orders) {
-    const order = data[table].orders[orderId]
-    if (order.groupType === 1 && !showFood) continue
-    if (order.groupType === 2 && !showDrinks) continue
-    allOrders.push({...order, id: orderId})
-    if (firstCreated && firstCreated > order.created) continue
-    firstCreated = order.created
-  }
 
-  allOrders.sort(sortOrdersByCreated)
-
-  return [allOrders, firstCreated]
-}
-
-export default function useOrders(dontShowAll, showFood, showDrinks) {
+export default function useOrders(dontShowAll, filteredProductGroups) {
 
   const [refreshTimeStamp, setRefreshTimestamp] = useState(new Date())
   const [tables, setTables] = useState([])
+  const [productGroups, setProductGroups] = useState({})
+  const [productIdToProductGroup, setProductIdToProductGroup] = useState({})
+
+  function FilterData(data, table) {
+    const allOrders = []
+    let firstCreated;
+    for (const orderId in data[table].orders) {
+      const order = data[table].orders[orderId]
+      if (!filteredProductGroups.includes(`${productIdToProductGroup[order.productId]?.id}`)) continue
+      allOrders.push({...order, id: orderId})
+      if (order.made || (firstCreated && firstCreated <= order.created)) continue
+      firstCreated = order.created
+    }
+
+    allOrders.sort(sortOrdersByCreated)
+
+    return [allOrders, firstCreated]
+  }
+
+  useEffect(() => {
+    let disposed = false
+    async function getData(){
+      const {status, data} = await get('/productsToProductGroup')
+      if (disposed) 
+      
+      if (status !== 200){
+        console.error("Unable to get products", status, data)
+        return
+      }
+
+      setProductIdToProductGroup(data)
+      const productGroups = {}
+      Object.values(data).forEach(d => {
+        productGroups[d.id] = d.name
+      })
+
+      setProductGroups(productGroups)
+    }
+
+    getData()
+    return () => disposed = true
+  }, [])
 
   useEffect(() => {
     let disposed = false
 
-    async function getOrders(isDisposed = () => false) {
+    async function getOrders() {
       const {status, data} = await get('/orders')
-      if (isDisposed()) return
+      if (disposed) return
 
       if (status !== 200) {
         console.error("Unable to get all orders.", status, data)
@@ -54,7 +80,7 @@ export default function useOrders(dontShowAll, showFood, showDrinks) {
         if (allOrders?.length > 0) {
 
           // Apply Filter
-          [allOrders, firstCreated] = FilterData(data, table, showFood, showDrinks)
+          [allOrders, firstCreated] = FilterData(data, table, filteredProductGroups)
 
           if ((!dontShowAll || !allOrders.every(o => o.made))) {
             result.push({id: table, ...data[table], orders: allOrders, firstCreated})
@@ -75,7 +101,8 @@ export default function useOrders(dontShowAll, showFood, showDrinks) {
       disposed = true
       clearInterval(intervalId)
     }
-  }, [dontShowAll, showDrinks, showFood, refreshTimeStamp])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dontShowAll, filteredProductGroups.length, refreshTimeStamp])
 
-  return {tables, setRefreshTimestamp}
+  return {tables, setRefreshTimestamp, productGroups, productIdToProductGroup}
 }

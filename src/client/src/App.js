@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {ThemeProvider, makeStyles} from '@material-ui/core/styles';
 import Theme from './Theme';
 import OrderPage from './Pages/OrderPage';
@@ -9,6 +9,7 @@ import IconButton from '@material-ui/core/IconButton';
 import FilterIcon from '@material-ui/icons/FilterList';
 import Badge from '@material-ui/core/Badge';
 import FilterDialog from './Components/FilterDialog';
+import useOrders from './hooks/useOrders';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -30,9 +31,20 @@ const useStyles = makeStyles((theme) => ({
 function App() {
   const classes = useStyles();
   const [dontShowAll, setDontShowAll] = useState(true)
-  const [showFood, setShowFood] = useState(true)
-  const [showDrinks, setShowDrinks] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [filteredProductGroup, setFilteredProductGroup] = useState([])
+  const [productGroupInitialized, setProductGroupInitialized] = useState(false)
+
+
+  const {tables, initialized, setRefreshTimestamp, productGroups} = useOrders(dontShowAll, filteredProductGroup)
+
+  const productIds = Object.keys(productGroups)
+  useEffect(() => {
+    if (productGroupInitialized || productIds.length < 1) return
+
+    setProductGroupInitialized(true)
+    setFilteredProductGroup(productIds)
+  }, [productGroupInitialized, productIds])
 
   return (
     <ThemeProvider theme={Theme}>
@@ -43,14 +55,14 @@ function App() {
           </Typography>
 
           <IconButton color="inherit" onClick={() => setDialogOpen(true)}>
-            <Badge color="secondary" variant="dot" overlap="rectangular" invisible={dontShowAll && showDrinks && showFood}>
+            <Badge color="secondary" variant="dot" overlap="rectangular" invisible={dontShowAll && productIds.length === filteredProductGroup.length}>
               <FilterIcon />
             </Badge>
           </IconButton>
         </Toolbar>
       </AppBar>
-      <FilterDialog dontShowAll={dontShowAll} setDontShowAll={setDontShowAll} showFood={showFood} setShowFood={setShowFood} showDrinks={showDrinks} setShowDrinks={setShowDrinks} open={dialogOpen} onClose={() => setDialogOpen(false)} />
-      <OrderPage dontShowAll={dontShowAll} showFood={showFood} showDrinks={showDrinks} />
+      <FilterDialog dontShowAll={dontShowAll} setDontShowAll={setDontShowAll} filteredProductGroup={filteredProductGroup} setFilteredProductGroup={setFilteredProductGroup} open={dialogOpen} onClose={() => setDialogOpen(false)} productGroups={productGroups} />
+      <OrderPage tables={tables} initialized={initialized} setRefreshTimestamp={setRefreshTimestamp} />
     </ThemeProvider>
   );
 }

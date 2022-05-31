@@ -6,9 +6,10 @@ import DialogActions from '@material-ui/core/DialogActions';
 import Dialog from '@material-ui/core/Dialog';
 import Checkbox from '@material-ui/core/Checkbox';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
+import {Typography} from '@material-ui/core';
 
 export default function ConfirmationDialog(props) {
-  const {onClose, dontShowAll, setDontShowAll, showDrinks, setShowDrinks, showFood, setShowFood, open} = props;
+  const {onClose, dontShowAll, setDontShowAll, filteredProductGroup, setFilteredProductGroup, open, productGroups} = props;
 
   const handleOk = () => {
     onClose();
@@ -17,6 +18,29 @@ export default function ConfirmationDialog(props) {
   const handleChange = setter => (event) => {
     setter(event.target.checked);
   };
+
+  const handleProductGroup = groupId => (event) => {
+    const newFilteredProductGroup = filteredProductGroup.filter(f => f !== groupId)
+    if (event.target.checked) {
+      newFilteredProductGroup.push(groupId)
+    }
+    setFilteredProductGroup(newFilteredProductGroup)
+  }
+
+  const productGroupsCheckboxes = []
+
+  for (const group in productGroups) {
+    productGroupsCheckboxes.push(<div key={group}>
+      <br />
+      <FormControlLabel control={
+        <Checkbox
+          checked={filteredProductGroup.includes(group)}
+          name={productGroups[group]}
+          onChange={handleProductGroup(group)} />
+      }
+        label={productGroups[group]} />
+    </div>)
+  }
 
   return (
     <Dialog
@@ -36,28 +60,10 @@ export default function ConfirmationDialog(props) {
           }
           label="Don't show fulfilled orders"
         />
-        <br/>
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={showDrinks}
-              onChange={handleChange(setShowDrinks)}
-              name="Show drinks"
-            />
-          }
-          label="Show drinks"
-        />
         <br />
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={showFood}
-              onChange={handleChange(setShowFood)}
-              name="Show food"
-            />
-          }
-          label="Show food"
-        />
+        <Typography variant='h6'> Produt groups</Typography>
+        {productGroupsCheckboxes}
+
       </DialogContent>
       <DialogActions>
         <Button onClick={handleOk} color="primary">

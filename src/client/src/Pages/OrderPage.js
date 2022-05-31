@@ -16,10 +16,8 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-export default function OrderPage({dontShowAll, showFood, showDrinks}) {
+export default function OrderPage({tables, initialized, setRefreshTimestamp}) {
   const classes = useStyles();
-
-  const {tables, initialized, setRefreshTimestamp} = useOrders(dontShowAll, showFood, showDrinks)
 
   let numOfOrders = 0
   var content = tables.map(table => {
