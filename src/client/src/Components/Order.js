@@ -12,7 +12,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import RadioButtonCheckedIcon from '@material-ui/icons/RadioButtonChecked';
 import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
 import EmojiFoodBeverageIcon from '@material-ui/icons/EmojiFoodBeverage';
-import { post } from 'axios'
+import {post} from 'axios'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -26,11 +26,11 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const dateOptions = { month: 'long', day: 'numeric'};
+const dateOptions = {month: 'long', day: 'numeric'};
 
 export default function Order(props) {
   const classes = useStyles();
-  const {tableId, name, orders = {}, updateOrders} = props
+  const {tableId, name, orders = [], updateOrders, created} = props
   const [changingOrderId, setChaningOrderId] = useState(-1)
 
   const ToggleMade = (orderId) => async () => {
@@ -44,23 +44,21 @@ export default function Order(props) {
     setChaningOrderId(-1)
   }
 
-  var items = []
-  let timestamp = new Date()
-  for (const order in orders) {
-    const labelId = `checkbox-list-label-${order}`;
-    const {name, comment, made, created} = orders[order]
+  var items = orders.map(order => {
+    const {name, comment, made, id} = order
+    const labelId = `checkbox-list-label-${id}`;
     const icon = made ? <RadioButtonCheckedIcon /> : <RadioButtonUncheckedIcon />
-    items.push(
-      <ListItem key={order} role={undefined} dense button onClick={ToggleMade(order)} disabled={changingOrderId===order}>
+    return (
+      <ListItem key={id} role={undefined} dense button onClick={ToggleMade(id)} disabled={changingOrderId === id}>
         <ListItemIcon>
           {icon}
         </ListItemIcon>
         <ListItemText id={labelId} primary={name} secondary={comment} />
       </ListItem>
     );
-    timestamp = new Date(created)
-  }
+  })
 
+  const timestamp = new Date(created)
   return (
     <div className={classes.root}>
       <Card className={classes.card}>
@@ -80,6 +78,6 @@ export default function Order(props) {
         </CardContent>
       </Card>
     </div>
-    
+
   );
 }

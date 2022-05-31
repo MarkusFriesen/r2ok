@@ -22,10 +22,10 @@ export default function OrderPage({dontShowAll, showFood, showDrinks}) {
   const {tables, initialized, setRefreshTimestamp} = useOrders(dontShowAll, showFood, showDrinks)
 
   let numOfOrders = 0
-  var content = Object.keys(tables).map(tableId => {
-    const {name, orders} = tables[tableId]
-    numOfOrders += Object.keys(orders).length
-    return <Order key={tableId} tableId={tableId} name={name} orders={orders} updateOrders={() => setRefreshTimestamp(new Date())} />
+  var content = tables.map(table => {
+    const {name, orders, id, firstCreated} = table
+    numOfOrders += orders.length
+    return <Order key={id} created={firstCreated} tableId={id} name={name} orders={orders} updateOrders={() => setRefreshTimestamp(new Date())} />
   })
 
   const [openErrorDialog, setOpenErrorDialog] = useState(false)
@@ -38,7 +38,7 @@ export default function OrderPage({dontShowAll, showFood, showDrinks}) {
 
   useEffect(() => {
     if (!initialized || numOfOrders < 1) return
-    
+
     setSnackbarMessage("No orders available")
     setOpenSnackbar(true)
 
