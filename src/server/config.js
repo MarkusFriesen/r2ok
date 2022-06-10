@@ -9,6 +9,7 @@ const config = {
   },
   storage: {
     filePath: './data/orderStorage.json'
-  }
+  },
+  useTrainingData: false
 }
 module.exports = config

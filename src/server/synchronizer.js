@@ -26,7 +26,7 @@ const job = new CronJob('*/15 * * * * *', async () => {
     let page = 1
 
     do {
-      var {status, data} = await instance.get(`orders?page=${page++}&limit=250&trainingsMode=true`)
+      var {status, data} = await instance.get(`orders?page=${page++}&limit=250&trainingsMode=${config.useTrainingData}`)
       
       if (status !== 200) {
         setLastError(new Date(), status, data)
