@@ -2,7 +2,6 @@ import React, {useEffect, useState} from 'react';
 import {makeStyles} from '@material-ui/core/styles'
 import Order from '../Components/Order'
 import Masonry, {ResponsiveMasonry} from "react-responsive-masonry"
-import useOrders from '../hooks/useOrders';
 import {Snackbar} from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import Button from '@material-ui/core/Button';

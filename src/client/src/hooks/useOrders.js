@@ -25,12 +25,20 @@ export default function useOrders(dontShowAll, filteredProductGroups) {
   function FilterData(data, table) {
     const allOrders = []
     let firstCreated;
+    let firstCreatedIsMade = true
+
     for (const orderId in data[table].orders) {
       const order = data[table].orders[orderId]
       if (!filteredProductGroups.includes(`${productIdToProductGroup[order.productId]?.id}`)) continue
       allOrders.push({...order, id: orderId})
-      if (order.made || (firstCreated && firstCreated <= order.created)) continue
-      firstCreated = order.created
+
+      if (!firstCreated) {
+        firstCreated = order.created
+        firstCreatedIsMade = order.made
+      } else if (!order.made && (firstCreatedIsMade || firstCreated > order.created)) {
+        firstCreated = order.created
+        firstCreatedIsMade = order.made
+      }
     }
 
     allOrders.sort(sortOrdersByCreated)
@@ -40,14 +48,14 @@ export default function useOrders(dontShowAll, filteredProductGroups) {
 
   useEffect(() => {
     let disposed = false
-    async function getData(){
+    async function getData() {
       const {status, data} = await get('/productsToProductGroup')
-      if (disposed) 
-      
-      if (status !== 200){
-        console.error("Unable to get products", status, data)
-        return
-      }
+      if (disposed)
+
+        if (status !== 200) {
+          console.error("Unable to get products", status, data)
+          return
+        }
 
       setProductIdToProductGroup(data)
       const productGroups = {}
@@ -76,14 +84,14 @@ export default function useOrders(dontShowAll, filteredProductGroups) {
       const result = []
       for (const table in data) {
         let allOrders = Object.values(data[table].orders)
-        let firstCreated
+
         if (allOrders?.length > 0) {
 
           // Apply Filter
-          [allOrders, firstCreated] = FilterData(data, table, filteredProductGroups)
+          let [filteredOrders, firstCreated] = FilterData(data, table, filteredProductGroups)
 
-          if ((!dontShowAll || !allOrders.every(o => o.made))) {
-            result.push({id: table, ...data[table], orders: allOrders, firstCreated})
+          if ((!dontShowAll || !filteredOrders.every(o => o.made))) {
+            result.push({id: table, ...data[table], orders: filteredOrders, firstCreated})
           }
         }
       }
@@ -101,7 +109,7 @@ export default function useOrders(dontShowAll, filteredProductGroups) {
       disposed = true
       clearInterval(intervalId)
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dontShowAll, filteredProductGroups.length, refreshTimeStamp])
 
   return {tables, setRefreshTimestamp, productGroups, productIdToProductGroup}
