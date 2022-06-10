@@ -5,6 +5,7 @@ const winston = require('winston')
 let orders = {}
 let productsToProductGroup = {}
 let initialized = false
+let products = [] 
 
 const updateOrders = (data) => {
   data.forEach(order => {
@@ -71,6 +72,7 @@ const initializeTables = (data) => {
 }
 
 const initializeProducts = (data) => {
+  products = data
   data.forEach(product => {
     productsToProductGroup[product.product_id] = {name: product.productgroup.productgroup_name, id: product.productgroup.productgroup_id}
   });
@@ -90,6 +92,7 @@ const toggleOrder = (tableId, orderId) => {
 const getOrders = () => { return { ...orders } } 
 
 const getProductsToProductGroup = () => productsToProductGroup
+const getProducts = () => products
 
 let lastError = {}
 
@@ -105,5 +108,6 @@ module.exports = {
   getLastError,
   setLastError,
   initializeProducts,
-  getProductsToProductGroup
+  getProductsToProductGroup,
+  getProducts
 }

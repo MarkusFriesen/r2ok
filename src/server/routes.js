@@ -1,4 +1,4 @@
-const {toggleOrder, getOrders, getLastError, getProductsToProductGroup } = require('./orders')
+const {toggleOrder, getOrders, getLastError, getProductsToProductGroup, getProducts } = require('./orders')
 module.exports = function (app) {
   app.get('/orders', (_, res) => {
     res.send(getOrders())
@@ -17,6 +17,10 @@ module.exports = function (app) {
 
   app.get('/productsToProductGroup', (_, res) => {
     res.send(getProductsToProductGroup())
+  })
+
+  app.get('/products', (_, res) => {
+    res.send(getProducts())
   })
 
   app.get('/lasterror', (_, res) => {

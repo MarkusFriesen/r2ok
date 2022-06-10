@@ -26,14 +26,16 @@ const job = new CronJob('*/15 * * * * *', async () => {
     let page = 1
 
     do {
-      var {status, data} = await instance.get(`orders?page=${page++}&limit=999`)
+      var {status, data} = await instance.get(`orders?page=${page++}&limit=250&trainingsMode=true`)
+      
       if (status !== 200) {
         setLastError(new Date(), status, data)
         winston.warn(`[synchronizer] Couldn't get order data. Status: ${status}. Data:`, data)
         return
       }
       allData = [...allData, ...data]
-    } while (data && data.length === 999)
+    } while (data && data.length === 250)
+
     locked = false
 
     updateOrders(allData)
@@ -67,24 +69,31 @@ const getTableInformation = () => {
 }
 
 const getProductInformation = () => {
-  return new Promise((resolve, reject) => {
-    instance.get('products?includeProductGroup=true')
-    .then((response) => {
-      const {status, data} = response
-      
-      if (status !== 200) {
-        winston.error(`[synchronizer] Couldn't get product data. Status: ${status}. Data:`, data)
-        return
-      }
+  return new Promise(async function (resolve, reject) {
+    try {
 
-      initializeProducts(data)
+      let allData = []
+      let page = 1
+
+      do {
+        var {status, data} = await instance.get(`products?page=${page++}&limit=250&includeProductGroup=true`)
+
+        if (status !== 200) {
+          winston.error(`[synchronizer] Couldn't get product data. Status: ${status}. Data:`, data)
+          return
+        }
+
+        allData = [...allData, ...data]
+
+      } while (data && data.length === 250)
+
+      initializeProducts(allData)
 
       resolve()
-    })
-      .catch((error) => {
-        winston.error('[synchronizer] Error getting product information', error)
-        reject(error)
-      })
+    } catch (error) {
+      winston.error('[synchronizer] Error getting product information', error)
+      reject(error)
+    }
   })
 }
 
