@@ -1,13 +1,13 @@
-const {toggleOrder, getOrders, getLastError, getProductsToProductGroup, getProducts } = require('./orders')
+const {toggleOrder, getTablesWithOrders, getLastError, getProductsToProductGroup, getProducts } = require('./orders')
 module.exports = function (app) {
   app.get('/orders', (_, res) => {
-    res.send(getOrders())
+    res.send(getTablesWithOrders())
   })
 
-  app.post('/orders/:tableId/:orderId/toggleMade', (req, res) => {
-    const {tableId, orderId} = req.params
+  app.post('/orders/:orderId/toggleMade', (req, res) => {
+    const {orderId} = req.params
 
-    if (!toggleOrder(tableId, orderId)) {
+    if (!toggleOrder(orderId)) {
       res.status(404).send()
       return
     }

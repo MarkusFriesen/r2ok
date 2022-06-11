@@ -30,12 +30,12 @@ const dateOptions = {month: 'long', day: 'numeric'};
 
 export default function Order(props) {
   const classes = useStyles();
-  const {tableId, name, orders = [], updateOrders, created} = props
+  const {name, orders = [], updateOrders, created} = props
   const [changingOrderId, setChaningOrderId] = useState(-1)
 
   const ToggleMade = (orderId) => async () => {
     setChaningOrderId(orderId)
-    const {status} = await post(`/orders/${tableId}/${orderId}/toggleMade`)
+    const {status} = await post(`/orders/${orderId}/toggleMade`)
     if (status !== 200) {
       console.error("unable to toggle order", orderId)
       return
