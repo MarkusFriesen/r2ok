@@ -10,8 +10,8 @@ let products = []
 let tables = {}
 
 const updateOrders = (data) => {
-  data.forEach(order => {
-    orders[order.order_id] = {
+  orders = data.reduce((result, order) => {
+    result[order.order_id] = {
       made: false,
       ...orders[order.order_id],
       id: order.order_id,
@@ -25,7 +25,9 @@ const updateOrders = (data) => {
       productId: order.product_id,
       tableId: order.table_id
     }
-  })
+
+    return result
+  }, {})
 }
 
 const persistOrders = () => {
