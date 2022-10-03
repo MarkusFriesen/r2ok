@@ -8,7 +8,8 @@ const config = {
     maxFiles: 3
   },
   storage: {
-    filePath: './data/orderStorage.json'
+    filePath: './data/orderStorage.json',
+    couponPath: './data/couponStorage.json'
   },
   useTrainingData: false
 }

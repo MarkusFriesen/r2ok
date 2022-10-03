@@ -1,5 +1,5 @@
 const express = require('express')
-const startOrderSynchonization = require('./synchronizer.js')
+const {startOrderSynchonization} = require('./synchronizer.js')
 const app = express()
 const routes = require('./routes')
 const config = require('./config')

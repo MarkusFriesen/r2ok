@@ -30,3 +30,4 @@ combined.log
 
 # locally stored data
 data/orderStorage.json
+data/couponStorage.json

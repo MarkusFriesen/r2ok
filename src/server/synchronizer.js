@@ -1,6 +1,7 @@
 const axios = require('axios')
 const CronJob = require('cron').CronJob;
 const {updateOrders, initializeTables, rehydrateOrders, setLastError, initializeProducts} = require('./orders.js')
+const {rehydrateCoupons, updateCoupons} = require('./coupons.js')
 const config = require('./config.js')
 const winston = require('winston')
 
@@ -22,19 +23,11 @@ const job = new CronJob('*/15 * * * * *', async () => {
   locked = true
 
   try {
-    let allData = []
-    let page = 1
-
-    do {
-      var {status, data} = await instance.get(`orders?page=${page++}&limit=250&trainingsMode=${config.useTrainingData}`)
-      
-      if (status !== 200) {
-        setLastError(new Date(), status, data)
-        winston.warn(`[synchronizer] Couldn't get order data. Status: ${status}. Data:`, data)
-        return
-      }
-      allData = [...allData, ...data]
-    } while (data && data.length === 250)
+    const limit = 250
+    const allData = await getPaginatedData(
+      (page) => `orders?page=${page}&limit=${limit}&trainingsMode=${config.useTrainingData}`,
+      'Couldn\'t get order data',
+      limit)
 
     locked = false
 
@@ -71,21 +64,11 @@ const getTableInformation = () => {
 const getProductInformation = () => {
   return new Promise(async function (resolve, reject) {
     try {
-
-      let allData = []
-      let page = 1
-
-      do {
-        var {status, data} = await instance.get(`products?page=${page++}&limit=250&includeProductGroup=true`)
-
-        if (status !== 200) {
-          winston.error(`[synchronizer] Couldn't get product data. Status: ${status}. Data:`, data)
-          return
-        }
-
-        allData = [...allData, ...data]
-
-      } while (data && data.length === 250)
+      const limit = 250
+      const allData = await getPaginatedData(
+        (page) => `products?page=${page}&limit=${limit}&includeProductGroup=true`, 
+        'Couldn\'t get product data',
+        limit)
 
       initializeProducts(allData)
 
@@ -97,9 +80,47 @@ const getProductInformation = () => {
   })
 }
 
+const getPaginatedData = async (createUrlFromPagenumber, errorMessage, limit = 250) => {
+  let allData = []
+  let page = 1
+
+  do {
+    var {status, data} = await instance.get(createUrlFromPagenumber(page++))
+
+    if (status !== 200) {
+      winston.error(`[synchronizer] ${errorMessage}. Status: ${status}. Data:`, data)
+      return
+    }
+
+    allData = [...allData, ...data]
+  } while (data && data.length === limit)
+
+  return allData
+}
+
+const getAllCoupons = () => {
+  return new Promise(async function (resolve, reject) {
+    try {
+      const limit = 250
+      const allData = await getPaginatedData(
+        (page) => `coupons?page=${page}&limit=${limit}`,
+        'Couldn\'t get product data',
+        limit)
+
+      updateCoupons(allData)
+
+      resolve()
+    } catch (error) {
+      winston.error('[synchronizer] Error getting coupons', error)
+      reject(error)
+    }
+  })
+}
+
 const startOrderSynchonization = () => {
   winston.info('[synchronizer] Staring order synchronization')
   rehydrateOrders()
+  rehydrateCoupons()
   getTableInformation().then(() => {
     getProductInformation().then(
       () => {
@@ -108,4 +129,7 @@ const startOrderSynchonization = () => {
   })
 }
 
-module.exports = startOrderSynchonization
+module.exports = {
+  startOrderSynchonization,
+  getAllCoupons
+}

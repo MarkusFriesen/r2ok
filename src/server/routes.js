@@ -1,4 +1,7 @@
-const {toggleOrder, getTablesWithOrders, getLastError, getProductsToProductGroup, getProducts } = require('./orders')
+const {getCoupons} = require('./coupons')
+const {toggleOrder, getTablesWithOrders, getLastError, getProductsToProductGroup, getProducts} = require('./orders')
+const {getAllCoupons} = require('./synchronizer.js')
+
 module.exports = function (app) {
   app.get('/orders', (_, res) => {
     res.send(getTablesWithOrders())
@@ -25,5 +28,14 @@ module.exports = function (app) {
 
   app.get('/lasterror', (_, res) => {
     res.send(getLastError())
+  })
+
+  app.get('/coupons', (_, res) => {
+    res.send(getCoupons())
+  })
+
+  app.post('/coupons/refresh', async (_, res) => {
+    await getAllCoupons()
+    res.status(200).send()
   })
 }

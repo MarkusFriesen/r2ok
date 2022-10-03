@@ -1,25 +1,16 @@
-import React, {useEffect, useState} from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, {useEffect} from 'react';
+import {Outlet} from "react-router-dom";
 import {ThemeProvider, makeStyles} from '@material-ui/core/styles';
 import Theme from './Theme';
-import OrderPage from './Pages/OrderPage';
 import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
 import AppBar from '@material-ui/core/AppBar';
-import IconButton from '@material-ui/core/IconButton';
-import FilterIcon from '@material-ui/icons/FilterList';
-import Badge from '@material-ui/core/Badge';
-import FilterDialog from './Components/FilterDialog';
-import useOrders from './hooks/useOrders';
+import {Button} from '@material-ui/core';
+import {useNavigate, useLocation} from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
-  root: {
-    flexGrow: 1,
-  },
-  menuButton: {
-    marginRight: theme.spacing(2),
-  },
   title: {
-    flexGrow: 1,
+    flexGrow: 3,
   },
   "@global": {
     body: {
@@ -29,40 +20,35 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function App() {
-  const classes = useStyles();
-  const [dontShowAll, setDontShowAll] = useState(true)
-  const [dialogOpen, setDialogOpen] = useState(false)
-  const [filteredProductGroup, setFilteredProductGroup] = useState([])
-  const [productGroupInitialized, setProductGroupInitialized] = useState(false)
-
-
-  const {tables, initialized, setRefreshTimestamp, productGroups} = useOrders(dontShowAll, filteredProductGroup)
-
-  const productIds = Object.keys(productGroups)
+  const navigate = useNavigate();
+  const location = useLocation();
+  
   useEffect(() => {
-    if (productGroupInitialized || productIds.length < 1) return
-
-    setProductGroupInitialized(true)
-    setFilteredProductGroup(productIds)
-  }, [productGroupInitialized, productIds])
+    if (location.pathname === "/")
+      navigate("/orders")
+  }, [location.pathname])
+  
+  const classes = useStyles();
 
   return (
     <ThemeProvider theme={Theme}>
-      <AppBar position="static">
+      <AppBar position="static" className={classes.title}>
         <Toolbar>
-          <Typography variant="h6" className={classes.title}>
-            Ready2Order Kitchen
-          </Typography>
-
-          <IconButton color="inherit" onClick={() => setDialogOpen(true)}>
-            <Badge color="secondary" variant="dot" overlap="rectangular" invisible={dontShowAll && productIds.length === filteredProductGroup.length}>
-              <FilterIcon />
-            </Badge>
-          </IconButton>
+          <Button 
+            size="large" 
+            color={location.pathname === '/orders' ? "secondary": "inherit"} 
+            onClick={() => navigate("/orders")}>
+              Kitchen
+          </Button>
+          <Button 
+            size="large" 
+            color={location.pathname === '/coupons' ? "secondary" : "inherit"} 
+            onClick={() => navigate("/coupons")}>
+              Coupons
+          </Button>
         </Toolbar>
       </AppBar>
-      <FilterDialog dontShowAll={dontShowAll} setDontShowAll={setDontShowAll} filteredProductGroup={filteredProductGroup} setFilteredProductGroup={setFilteredProductGroup} open={dialogOpen} onClose={() => setDialogOpen(false)} productGroups={productGroups} />
-      <OrderPage tables={tables} initialized={initialized} setRefreshTimestamp={setRefreshTimestamp} />
+      <Outlet />
     </ThemeProvider>
   );
 }
