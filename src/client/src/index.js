@@ -6,15 +6,15 @@ import Coupons from './Pages/Coupons';
 import reportWebVitals from './reportWebVitals';
 
 import {
-  createBrowserRouter,
+  createHashRouter,
   RouterProvider,
 } from "react-router-dom";
 
-const router = createBrowserRouter([
+const router = createHashRouter([
   {
     path: "/",
     element: <App />,
-    
+
     children: [
       {
         path: "orders",

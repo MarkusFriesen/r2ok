@@ -40,7 +40,7 @@ export default function useCoupons(filter){
 
   const refresh = async () => {
     setLoading(true)
-    await post('/coupon/refresh')
+    await post('/coupons/refresh')
     setNextFetch(new Date())
   }
 

@@ -25,7 +25,7 @@ function App() {
   
   useEffect(() => {
     if (location.pathname === "/")
-      navigate("/orders")
+      navigate("orders")
   }, [location.pathname])
   
   const classes = useStyles();
