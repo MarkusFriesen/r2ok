@@ -12,7 +12,7 @@ let tables = {}
 const updateOrders = (data) => {
   orders = data.reduce((result, order) => {
     result[order.order_id] = {
-      made: false,
+      status: 0,
       ...orders[order.order_id],
       id: order.order_id,
       name: order.order_product_name,
@@ -61,12 +61,12 @@ const initializeProducts = (data) => {
   });
 }
 
-const toggleOrder = (orderId) => {
+const toggleStatus = (orderId) => {
   if (!orders[orderId]) {
     return false
   }
 
-  orders[orderId].made = !orders[orderId].made
+  orders[orderId].status = (orders[orderId].status + 1) % 3
 
   persistOrders()
   return true
@@ -93,7 +93,7 @@ const getLastError = () => lastError
 const setLastError = (date, code, error) => lastError = {date, error, code}
 
 module.exports = {
-  toggleOrder,
+  toggleOrder: toggleStatus,
   initializeTables,
   updateOrders,
   getOrders,

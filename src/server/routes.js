@@ -7,7 +7,7 @@ module.exports = function (app) {
     res.send(getTablesWithOrders())
   })
 
-  app.post('/orders/:orderId/toggleMade', (req, res) => {
+  app.post('/orders/:orderId/toggleStatus', (req, res) => {
     const {orderId} = req.params
 
     if (!toggleOrder(orderId)) {

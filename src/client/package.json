@@ -9,14 +9,14 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^14.4.3",
     "axios": "^0.27.2",
-    "copy-to-clipboard": "^3.3.2",
+    "copy-to-clipboard": "^3.3.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-jsbarcode": "^0.2.4",
     "react-responsive-masonry": "^2.1.6",
-    "react-router-dom": "^6.4.1",
+    "react-router-dom": "^6.4.4",
     "react-scripts": "5.0.1",
-    "web-vitals": "^3.0.2"
+    "web-vitals": "^3.1.0"
   },
   "scripts": {
     "start": "react-scripts start",

@@ -9,9 +9,11 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import RadioButtonCheckedIcon from '@material-ui/icons/RadioButtonChecked';
+import DoneIcon from '@material-ui/icons/Done';
+import DoneAllIcon from '@material-ui/icons/DoneAll';
 import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
 import EmojiFoodBeverageIcon from '@material-ui/icons/EmojiFoodBeverage';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import {post} from 'axios'
 
 const useStyles = makeStyles((theme) => ({
@@ -24,18 +26,45 @@ const useStyles = makeStyles((theme) => ({
   avatar: {
     backgroundColor: red[500],
   },
+  loading: {
+    position: "absolute",
+    left: 10,
+    top: 2,
+  }
 }));
 
 const dateOptions = {month: 'long', day: 'numeric'};
 
+function getStatusIcon(status) {
+  switch (status) {
+    case 1:
+      return <DoneIcon />
+    case 2:
+      return <DoneAllIcon />
+    default:
+      return <RadioButtonUncheckedIcon />
+  }
+}
+
+function getCircularProgress(value, status, classname) {
+  if (status === 2) return <React.Fragment />
+  value = value > 100 ? 100 : value
+  return <CircularProgress
+    color={value > 50 ? "secondary" : "primary"}
+    value={value}
+    variant="determinate"
+    size={36} 
+    thickness={6} 
+    className={classname} />
+}
 export default function Order(props) {
   const classes = useStyles();
   const {name, orders = [], updateOrders, created} = props
   const [changingOrderId, setChaningOrderId] = useState(-1)
 
-  const ToggleMade = (orderId) => async () => {
+  const ToggleStatus = (orderId) => async () => {
     setChaningOrderId(orderId)
-    const {status} = await post(`/orders/${orderId}/toggleMade`)
+    const {status} = await post(`/orders/${orderId}/toggleStatus`)
     if (status !== 200) {
       console.error("unable to toggle order", orderId)
       return
@@ -44,14 +73,24 @@ export default function Order(props) {
     setChaningOrderId(-1)
   }
 
+  const now = new Date();
   var items = orders.map(order => {
-    const {name, comment, made, id} = order
+    const {name, comment, status, id, created} = order
+    let value = 0;
+
+    try {
+      const createdAt = new Date(created);
+      value = (((now - createdAt) / 60000 / 30) * 100).toFixed(0)
+    } catch (e) {
+      console.error("Error craeting difference: ", e)
+    }
+
     const labelId = `checkbox-list-label-${id}`;
-    const icon = made ? <RadioButtonCheckedIcon /> : <RadioButtonUncheckedIcon />
     return (
-      <ListItem key={id} role={undefined} dense button onClick={ToggleMade(id)} disabled={changingOrderId === id}>
+      <ListItem key={id} role={undefined} dense button onClick={ToggleStatus(id)} disabled={changingOrderId === id}>
         <ListItemIcon>
-          {icon}
+          {getCircularProgress(value, status, classes.loading)}
+          {getStatusIcon(status)}
         </ListItemIcon>
         <ListItemText id={labelId} primary={name} secondary={comment} />
       </ListItem>
