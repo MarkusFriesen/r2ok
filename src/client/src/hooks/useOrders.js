@@ -25,7 +25,7 @@ export default function useOrders(dontShowAll, filteredProductGroups) {
   function FilterData(data, table) {
     const allOrders = []
     let firstCreated;
-    let firstCreatedIsMade = true
+    let firstCreatedStatus = 2
 
     for (const orderId in data[table].orders) {
       const order = data[table].orders[orderId]
@@ -34,10 +34,10 @@ export default function useOrders(dontShowAll, filteredProductGroups) {
 
       if (!firstCreated) {
         firstCreated = order.created
-        firstCreatedIsMade = order.made
-      } else if (!order.made && (firstCreatedIsMade || firstCreated > order.created)) {
+        firstCreatedStatus = order.status
+      } else if (order.status < 2 && (firstCreatedStatus === 2 || firstCreated > order.created)) {
         firstCreated = order.created
-        firstCreatedIsMade = order.made
+        firstCreatedStatus = order.status
       }
     }
 
@@ -90,7 +90,7 @@ export default function useOrders(dontShowAll, filteredProductGroups) {
           // Apply Filter
           let [filteredOrders, firstCreated] = FilterData(data, table, filteredProductGroups)
 
-          if ((!dontShowAll || !filteredOrders.every(o => o.made))) {
+          if ((!dontShowAll || !filteredOrders.every(o => o.status === 2))) {
             result.push({id: table, ...data[table], orders: filteredOrders, firstCreated})
           }
         }
