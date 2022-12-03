@@ -33,7 +33,9 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const dateOptions = {month: 'long', day: 'numeric'};
+const dateOptions = {month: 'short', day: 'numeric'};
+const timeOptions = {hour: 'numeric', minute: 'numeric'};
+const language = window.navigator.language;
 
 function getStatusIcon(status) {
   switch (status) {
@@ -46,15 +48,15 @@ function getStatusIcon(status) {
   }
 }
 
-function getCircularProgress(value, status, classname) {
+function getCircularProgress(value, status, classname, loading) {
   if (status === 2) return <React.Fragment />
   value = value > 100 ? 100 : value
   return <CircularProgress
     color={value > 50 ? "secondary" : "primary"}
     value={value}
-    variant="determinate"
-    size={36} 
-    thickness={6} 
+    variant={loading ? "indeterminate" : "determinate"}
+    size={36}
+    thickness={6}
     className={classname} />
 }
 export default function Order(props) {
@@ -82,14 +84,14 @@ export default function Order(props) {
       const createdAt = new Date(created);
       value = (((now - createdAt) / 60000 / 30) * 100).toFixed(0)
     } catch (e) {
-      console.error("Error craeting difference: ", e)
+      console.error("Error creating difference: ", e)
     }
 
     const labelId = `checkbox-list-label-${id}`;
     return (
       <ListItem key={id} role={undefined} dense button onClick={ToggleStatus(id)} disabled={changingOrderId === id}>
         <ListItemIcon>
-          {getCircularProgress(value, status, classes.loading)}
+          {getCircularProgress(value, status, classes.loading, changingOrderId === id)}
           {getStatusIcon(status)}
         </ListItemIcon>
         <ListItemText id={labelId} primary={name} secondary={comment} />
@@ -108,7 +110,7 @@ export default function Order(props) {
             </Avatar>
           }
           title={name}
-          subheader={`${timestamp.toLocaleDateString(undefined, dateOptions)} ${timestamp.toLocaleTimeString()}`}
+          subheader={`${timestamp.toLocaleDateString(language, dateOptions)} ${timestamp.toLocaleTimeString(language, timeOptions)}`}
         />
         <CardContent>
           <List >
