@@ -28,8 +28,7 @@ const useStyles = makeStyles((theme) => ({
   },
   loading: {
     position: "absolute",
-    left: 10,
-    top: 2,
+    transform: "translate(-16%, -16%) !important",
   }
 }));
 
