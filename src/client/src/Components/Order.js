@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
   },
   loading: {
     position: "absolute",
-    transform: "translate(-16%, -16%) !important",
+    transform: "translate(-16%, -16%) rotate(-90deg) !important",
   }
 }));
 
