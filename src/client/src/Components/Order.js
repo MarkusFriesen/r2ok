@@ -74,13 +74,13 @@ export default function Order(props) {
     setChaningOrderId(-1)
   }
 
-  const now = new Date();
+  const now = new Date().getTime();
   var items = orders.map(order => {
     const {name, comment, status, id, created} = order
     let value = 0;
 
     try {
-      const createdAt = new Date(created);
+      const createdAt = new Date(created).getTime();
       value = (((now - createdAt) / 60000 / 30) * 100).toFixed(0)
     } catch (e) {
       console.error("Error creating difference: ", e)
