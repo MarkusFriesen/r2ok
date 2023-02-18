@@ -11,6 +11,12 @@ const config = {
     filePath: './data/orderStorage.json',
     couponPath: './data/couponStorage.json'
   },
-  useTrainingData: false
+  useTrainingData: false,
+  fetch: {
+    //Fetch the latest products on Thrusday, Friday and Saturday at 6:30pm
+    productsCron: '30 18 * * 4,5,6',
+    // Fetch all orders every 15 seconds
+    orderCron: '*/15 * * * * *'
+  }
 }
 module.exports = config

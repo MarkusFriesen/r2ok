@@ -15,9 +15,7 @@ const instance = axios.create({
 
 var locked = false
 
-// Fetch all orders every 15 seconds, and overwrite them
-const job = new CronJob('*/15 * * * * *', async () => {
-
+const job = new CronJob(config.fetch.orderCron, async () => {
   // lock api calls to disable concurrent calls
   if (locked) return
   locked = true
@@ -38,6 +36,10 @@ const job = new CronJob('*/15 * * * * *', async () => {
     setLastError(new Date(), 500, exception)
     winston.error('[synchronizer] Error getting orders', exception)
   }
+})
+
+const fetchProductsPeriodically = new CronJob(config.fetch.productsCron, async () => {
+  await getProductInformation();
 })
 
 const getTableInformation = () => {
@@ -66,7 +68,7 @@ const getProductInformation = () => {
     try {
       const limit = 250
       const allData = await getPaginatedData(
-        (page) => `products?page=${page}&limit=${limit}&includeProductGroup=true`, 
+        (page) => `products?page=${page}&limit=${limit}&includeProductGroup=true`,
         'Couldn\'t get product data',
         limit)
 
@@ -125,6 +127,7 @@ const startOrderSynchonization = () => {
     getProductInformation().then(
       () => {
         job.start()
+        fetchProductsPeriodically.start();
       })
   })
 }
