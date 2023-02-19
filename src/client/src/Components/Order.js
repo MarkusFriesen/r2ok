@@ -81,7 +81,7 @@ export default function Order(props) {
 
     try {
       const createdAt = new Date(created).getTime();
-      value = (((now - createdAt) / 60000 / 30) * 100).toFixed(0)
+      value = (((now - createdAt) / 60000 / 45) * 100).toFixed(0)
     } catch (e) {
       console.error("Error creating difference: ", e)
     }
