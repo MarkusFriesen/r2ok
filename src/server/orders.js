@@ -11,6 +11,7 @@ let tables = {}
 
 const updateOrders = (data) => {
   orders = data.reduce((result, order) => {
+    const created = new Date(order.order_created_at)
     result[order.order_id] = {
       status: 0,
       ...orders[order.order_id],
@@ -19,7 +20,7 @@ const updateOrders = (data) => {
       comment: order.order_comment,
       number: order.order_number,
       quantity: order.order_quantity,
-      created: order.order_created_at,
+      created: created,
       groupType: order.productgroup_type_id,
       updated: true,
       productId: order.product_id,
