@@ -27,14 +27,14 @@ const job = new CronJob(config.fetch.orderCron, async () => {
       'Couldn\'t get order data',
       limit)
 
-    locked = false
-
     updateOrders(allData)
   } catch (exception) {
-    locked = false
 
     setLastError(new Date(), 500, exception)
     winston.error('[synchronizer] Error getting orders', exception)
+  } finally {
+
+    locked = false
   }
 })
 
