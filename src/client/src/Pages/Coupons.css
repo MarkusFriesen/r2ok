@@ -4,18 +4,18 @@
     padding-top: 15px
 }
 
-.search {
+.paper .search {
     margin-left: 15px
 }
 
-.filter {
+.paper .filter {
     width: 100%;
     display: grid;
     grid-template: auto / auto 55px;
     margin-bottom: 15px
 }
 
-.round {
+.paper .round {
     background-color: #f50057;
     border-radius: 1rem;
 
@@ -23,7 +23,7 @@
     padding: 5px
 }
 
-.content {
+.paper .content {
     padding: 1px;
     align-content: center
 }
