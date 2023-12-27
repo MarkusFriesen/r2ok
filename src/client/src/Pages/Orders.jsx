@@ -1,29 +1,16 @@
-import React, {useEffect, useState} from 'react';
-import {makeStyles} from '@material-ui/core/styles'
+import React, { useEffect, useState } from 'react';
 import Order from '../Components/Order'
-import Masonry, {ResponsiveMasonry} from "react-responsive-masonry"
-import Snackbar from '@material-ui/core/Snackbar';
-import CloseIcon from '@material-ui/icons/Close';
-import Button from '@material-ui/core/Button';
-import IconButton from '@material-ui/core/IconButton';
+import Masonry, { ResponsiveMasonry } from "react-responsive-masonry"
+import Snackbar from '@mui/material/Snackbar';
+import CloseIcon from '@mui/icons-material/Close';
+import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
 import ErrorDialog from '../Components/ErrorDialog';
 import useOrders from '../hooks/useOrders';
-import FilterIcon from '@material-ui/icons/FilterList';
-import Badge from '@material-ui/core/Badge';
+import FilterIcon from '@mui/icons-material/FilterList';
+import Badge from '@mui/material/Badge';
 import FilterDialog from '../Components/FilterDialog';
-
-const useStyles = makeStyles(() => ({
-  root: {
-    marginTop: 15,
-    flexGrow: 1,
-  },
-  floatRight: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    color: "white"
-  }
-}));
+import "./Orders.css"
 
 export default function OrderPage() {
 
@@ -32,7 +19,7 @@ export default function OrderPage() {
   const [filteredProductGroup, setFilteredProductGroup] = useState([])
   const [productGroupInitialized, setProductGroupInitialized] = useState(false)
 
-  const {tables, initialized, setRefreshTimestamp, productGroups} = useOrders(dontShowAll, filteredProductGroup)
+  const { tables, initialized, setRefreshTimestamp, productGroups } = useOrders(dontShowAll, filteredProductGroup)
 
   const productIds = Object.keys(productGroups)
   useEffect(() => {
@@ -42,11 +29,9 @@ export default function OrderPage() {
     setFilteredProductGroup(productIds)
   }, [productGroupInitialized, productIds])
 
-  const classes = useStyles();
-
   let numOfOrders = 0
   var content = tables?.map(table => {
-    const {name, orders, id, firstCreated} = table
+    const { name, orders, id, firstCreated } = table
     numOfOrders += orders.length
     return <Order key={id} created={firstCreated} tableId={id} name={name} orders={orders} updateOrders={() => setRefreshTimestamp(new Date())} />
   })
@@ -68,10 +53,10 @@ export default function OrderPage() {
   }, [numOfOrders, initialized])
 
   return (
-    <div>
-      <div className={classes.root}>
+    <>
+      <div className="order-root">
         <ResponsiveMasonry
-          columnsCountBreakPoints={{350: 1, 750: 2, 1280: 3, 1920: 4}}
+          columnsCountBreakPoints={{ 350: 1, 750: 2, 1280: 3, 1920: 4 }}
         >
           <Masonry>
             {content}
@@ -101,16 +86,14 @@ export default function OrderPage() {
           open={openErrorDialog}
           setOpen={setOpenErrorDialog} />
       </div>
-      <div>
-        <div className={classes.floatRight}>
-          <IconButton color="inherit" onClick={() => setDialogOpen(true)}>
-            <Badge color="secondary" variant="dot" overlap="rectangular" invisible={dontShowAll && productIds.length === filteredProductGroup.length}>
-              <FilterIcon />
-            </Badge>
-          </IconButton>
-          <FilterDialog dontShowAll={dontShowAll} setDontShowAll={setDontShowAll} filteredProductGroup={filteredProductGroup} setFilteredProductGroup={setFilteredProductGroup} open={dialogOpen} onClose={() => setDialogOpen(false)} productGroups={productGroups} />
-        </div>
-      </div>
-    </div>
+      <section className="float-right">
+        <IconButton color="inherit" onClick={() => setDialogOpen(true)}>
+          <Badge color="secondary" variant="dot" overlap="rectangular" invisible={dontShowAll && productIds.length === filteredProductGroup.length}>
+            <FilterIcon />
+          </Badge>
+        </IconButton>
+        <FilterDialog dontShowAll={dontShowAll} setDontShowAll={setDontShowAll} filteredProductGroup={filteredProductGroup} setFilteredProductGroup={setFilteredProductGroup} open={dialogOpen} onClose={() => setDialogOpen(false)} productGroups={productGroups} />
+      </section>
+    </>
   );
 }

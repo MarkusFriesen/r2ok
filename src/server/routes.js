@@ -3,11 +3,11 @@ const {toggleOrder, getTablesWithOrders, getLastError, getProductsToProductGroup
 const {getAllCoupons} = require('./synchronizer.js')
 
 module.exports = function (app) {
-  app.get('/orders', (_, res) => {
+  app.get('/api/orders', (_, res) => {
     res.send(getTablesWithOrders())
   })
 
-  app.post('/orders/:orderId/toggleStatus', (req, res) => {
+  app.post('/api/orders/:orderId/toggleStatus', (req, res) => {
     const {orderId} = req.params
 
     if (!toggleOrder(orderId)) {
@@ -18,23 +18,23 @@ module.exports = function (app) {
     res.status(200).send()
   })
 
-  app.get('/productsToProductGroup', (_, res) => {
+  app.get('/api/productsToProductGroup', (_, res) => {
     res.send(getProductsToProductGroup())
   })
 
-  app.get('/products', (_, res) => {
+  app.get('/api/products', (_, res) => {
     res.send(getProducts())
   })
 
-  app.get('/lasterror', (_, res) => {
+  app.get('/api/lasterror', (_, res) => {
     res.send(getLastError())
   })
 
-  app.get('/coupons', (_, res) => {
+  app.get('/api/coupons', (_, res) => {
     res.send(getCoupons())
   })
 
-  app.post('/coupons/refresh', async (_, res) => {
+  app.post('/api/coupons/refresh', async (_, res) => {
     await getAllCoupons()
     res.status(200).send()
   })

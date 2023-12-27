@@ -1,9 +1,9 @@
-import {useEffect, useState} from "react";
-import {get} from "axios";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 const DEFAULT_TITLE = "No errors"
 const DEFAULT_DETAILS = "The next orders will be fetched soon"
-export default function useErrorMessages({nextFetchTime}) {
+export default function useErrorMessages({ nextFetchTime }) {
   const [title, setTitle] = useState(DEFAULT_TITLE)
   const [details, setDetails] = useState(DEFAULT_DETAILS)
 
@@ -11,7 +11,7 @@ export default function useErrorMessages({nextFetchTime}) {
     let disposed = false
     async function getData() {
 
-      const {data, status} = await get("lasterror")
+      const { data, status } = await axios.get("/api/lasterror")
 
       if (disposed) return
 
@@ -34,5 +34,5 @@ export default function useErrorMessages({nextFetchTime}) {
     return () => disposed = true
   }, [nextFetchTime])
 
-  return {title, details}
+  return { title, details }
 }

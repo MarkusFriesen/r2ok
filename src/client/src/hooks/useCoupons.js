@@ -1,8 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import {useEffect, useState} from "react"
-import {get,post} from 'axios'
+import { useEffect, useState } from "react"
+import axios from 'axios'
 
-export default function useCoupons(filter){
+export default function useCoupons(filter) {
 
   const [coupons, setCoupons] = useState([])
   const [filteredCoupons, setFilteredCoupons] = useState([])
@@ -17,10 +17,10 @@ export default function useCoupons(filter){
   useEffect(() => {
     let disposed = false
     async function getData() {
-      
+
       setError(null)
       setLoading(true)
-      const {status, data} = await get('/coupons')
+      const { status, data } = await axios.get('/api/coupons')
       setLoading(false)
 
       if (disposed) return
@@ -40,7 +40,7 @@ export default function useCoupons(filter){
 
   const refresh = async () => {
     setLoading(true)
-    await post('/coupons/refresh')
+    await axios.post('/coupons/refresh')
     setNextFetch(new Date())
   }
 

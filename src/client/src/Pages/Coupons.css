@@ -1,0 +1,29 @@
+.paper {
+    max-width: 500px;
+    margin: 25px auto;
+    padding-top: 15px
+}
+
+.search {
+    margin-left: 15px
+}
+
+.filter {
+    width: 100%;
+    display: grid;
+    grid-template: auto / auto 55px;
+    margin-bottom: 15px
+}
+
+.round {
+    background-color: #f50057;
+    border-radius: 1rem;
+
+    width: 35px;
+    padding: 5px
+}
+
+.content {
+    padding: 1px;
+    align-content: center
+}

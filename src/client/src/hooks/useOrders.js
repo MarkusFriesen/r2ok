@@ -1,5 +1,5 @@
-import {useEffect, useState} from "react"
-import {get} from 'axios'
+import { useEffect, useState } from "react"
+import axios from 'axios'
 
 function sortOrdersByCreated(a, b) {
   if (a.created > b.created) return 1
@@ -13,7 +13,6 @@ function sortTables(a, b) {
   if (a.firstCreated > b.firstCreated) return 1
   else return -1
 }
-
 
 export default function useOrders(dontShowAll, filteredProductGroups) {
 
@@ -29,8 +28,7 @@ export default function useOrders(dontShowAll, filteredProductGroups) {
 
     for (const orderId in data[table].orders) {
       const order = data[table].orders[orderId]
-      if (!filteredProductGroups.includes(`${productIdToProductGroup[order.productId]?.id}`)) continue
-      allOrders.push({...order, id: orderId})
+      allOrders.push({ ...order, id: orderId, inFilter: filteredProductGroups.includes(`${productIdToProductGroup[order.productId]?.id}`) })
 
       if (!firstCreated) {
         firstCreated = order.created
@@ -49,7 +47,7 @@ export default function useOrders(dontShowAll, filteredProductGroups) {
   useEffect(() => {
     let disposed = false
     async function getData() {
-      const {status, data} = await get('/productsToProductGroup')
+      const { status, data } = await axios.get('/api/productsToProductGroup')
       if (disposed)
 
         if (status !== 200) {
@@ -74,7 +72,7 @@ export default function useOrders(dontShowAll, filteredProductGroups) {
     let disposed = false
 
     async function getOrders() {
-      const {status, data} = await get('/orders')
+      const { status, data } = await axios.get('/api/orders')
       if (disposed) return
 
       if (status !== 200) {
@@ -91,7 +89,7 @@ export default function useOrders(dontShowAll, filteredProductGroups) {
           let [filteredOrders, firstCreated] = FilterData(data, table, filteredProductGroups)
 
           if ((!dontShowAll || !filteredOrders.every(o => o.status === 2))) {
-            result.push({id: table, ...data[table], orders: filteredOrders, firstCreated})
+            result.push({ id: table, ...data[table], orders: filteredOrders, firstCreated })
           }
         }
       }
@@ -112,5 +110,5 @@ export default function useOrders(dontShowAll, filteredProductGroups) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dontShowAll, filteredProductGroups.length, refreshTimeStamp])
 
-  return {tables, setRefreshTimestamp, productGroups, productIdToProductGroup}
+  return { tables, setRefreshTimestamp, productGroups, productIdToProductGroup }
 }

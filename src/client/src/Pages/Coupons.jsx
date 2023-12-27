@@ -1,39 +1,12 @@
-import {Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, LinearProgress, List, ListItem, ListItemAvatar, ListItemSecondaryAction, ListItemText, makeStyles, Paper, Snackbar, TextField, Typography} from '@material-ui/core';
-import React, {useState} from 'react';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, LinearProgress, List, ListItem, ListItemAvatar, ListItemSecondaryAction, ListItemText, Paper, Snackbar, TextField, Typography } from '@mui/material';
+import React, { useState } from 'react';
 import useCoupons from '../hooks/useCoupons';
 import Barcode from 'react-jsbarcode';
-import FileCopy from '@material-ui/icons/FileCopy';
+import FileCopy from '@mui/icons-material/FileCopy';
 import copy from 'copy-to-clipboard';
-import SearchIcon from '@material-ui/icons/Search';
-import RefreshIcon from '@material-ui/icons/Refresh';
-
-const useStyles = makeStyles((theme) => ({
-  paper: {
-    maxWidth: 500,
-    margin: '25px auto',
-    paddingTop: 15
-  },
-  search: {
-    marginLeft: 15
-  },
-  filter: {
-    width: '100%',
-    display: 'grid',
-    gridTemplate: 'auto / auto 55px',
-    marginBottom: 15
-  },
-  round: {
-    backgroundColor: theme.palette.secondary.main,
-    borderRadius: '1rem',
-
-    width: 35,
-    padding: 5
-  },
-  content: {
-    padding: 1,
-    alignContent: 'center'
-  }
-}));
+import SearchIcon from '@mui/icons-material/Search';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import "./Coupons.css"
 
 function Coupons() {
 
@@ -43,7 +16,6 @@ function Coupons() {
   const [selectedCoupon, setSelectedCoupon] = useState()
   const [showSnackbar, setShowSnackbar] = useState(false)
   const closeSnackbar = () => setShowSnackbar(false)
-  const classes = useStyles()
   const handleClose = () => setOpen(false)
 
   const handleCopy = (id) => {
@@ -53,11 +25,11 @@ function Coupons() {
   }
 
   return (
-    <Paper className={classes.paper}>
-      <div className={classes.filter} >
+    <Paper className="paper">
+      <div className="filter" >
         <TextField
           variant="outlined"
-          className={classes.search}
+          className="search"
           InputProps={{
             endAdornment: <SearchIcon />
           }}
@@ -81,8 +53,8 @@ function Coupons() {
               setOpen(true)
             }} >
               <ListItemAvatar>
-                <div className={classes.round}>
-                  <Typography color="textPrimary" className={classes.content} align="center" >
+                <div className="round">
+                  <Typography color="textPrimary" className="content" align="center" >
                     {parseInt(c.value).toFixed(0)}€
                   </Typography>
                 </div>
@@ -107,7 +79,7 @@ function Coupons() {
       >
         <DialogTitle>{selectedCoupon?.name}</DialogTitle>
         <DialogContent>
-          <Barcode value={selectedCoupon?.identifier} options={{format: 'EAN13'}} />
+          <Barcode value={selectedCoupon?.identifier} options={{ format: 'EAN13' }} />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => handleCopy(selectedCoupon?.identifier)} color="secondary">Copy</Button>

@@ -1,0 +1,31 @@
+.root {
+    margin: 15px
+}
+
+.card .avatar {
+    background-color: #f44336
+}
+
+.card .order-list-item-padding {
+    margin: 5px 0;
+    padding: 5px 10px;
+}
+
+.card .order-not-in-filter {
+    background-color: rgba(245, 239, 239, 0.4);
+    color: rgba(168, 162, 162, 0.2);
+    border-radius: 4px;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    margin: 0 -10px;
+}
+
+.card .order-list {
+    margin: 0 -5px;
+}
+
+.loading {
+    position: absolute;
+    transform: translate(-16%, -16%) rotate(-90deg) !important;
+}
