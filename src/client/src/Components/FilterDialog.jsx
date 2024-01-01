@@ -6,10 +6,10 @@ import DialogActions from '@mui/material/DialogActions';
 import Dialog from '@mui/material/Dialog';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import {Typography} from '@mui/material';
+import Typography from '@mui/material/Typography';
 
 export default function ConfirmationDialog(props) {
-  const {onClose, dontShowAll, setDontShowAll, filteredProductGroup, setFilteredProductGroup, open, productGroups} = props;
+  const { onClose, dontShowAll, setDontShowAll, filteredProductGroup, setFilteredProductGroup, open, productGroups } = props;
 
   const handleOk = () => {
     onClose();

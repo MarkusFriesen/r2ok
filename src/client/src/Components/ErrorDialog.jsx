@@ -7,8 +7,8 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import useErrorMessages from '../hooks/useErrorMessages';
 
-export default function ErrorDialog({open, setOpen}) {
-  const {title, details} = useErrorMessages(open)
+export default function ErrorDialog({ open, setOpen }) {
+  const { title, details } = useErrorMessages(open)
 
   const handleClose = () => {
     setOpen(false);

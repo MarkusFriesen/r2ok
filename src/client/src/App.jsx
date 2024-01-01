@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
 import { Outlet } from "react-router-dom";
-import { ThemeProvider } from '@mui/material/styles';
+import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import Theme from './Theme';
 import Toolbar from '@mui/material/Toolbar';
 import AppBar from '@mui/material/AppBar';
-import { Button } from '@mui/material';
+import Button from '@mui/material/Button';
 import { useNavigate, useLocation } from "react-router-dom";
 import './App.css';
 
@@ -15,6 +15,7 @@ function App() {
   useEffect(() => {
     if (location.pathname === "/")
       navigate("orders")
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname])
 
   return (
