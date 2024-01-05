@@ -40,7 +40,7 @@ export default function useCoupons(filter) {
 
   const refresh = async () => {
     setLoading(true)
-    await axios.post('/coupons/refresh')
+    await axios.post('/api/coupons/refresh')
     setNextFetch(new Date())
   }
 
