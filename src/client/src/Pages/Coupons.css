@@ -3,20 +3,32 @@
     margin: 25px auto;
     padding: 15px 8px 8px;
     border-radius: 28px !important;
-    overflow: hidden;
+    /* clip instead of hidden, so the sticky filter still sticks to the viewport */
+    overflow: clip;
 }
 
 .paper .search {
-    margin-left: 8px
+    margin-left: 8px;
+    width: calc(100% - 8px)
 }
 
 .paper .filter {
     width: 100%;
     display: grid;
-    grid-template: auto / auto 64px;
+    grid-template: auto / 1fr 64px;
     align-items: center;
     justify-items: center;
-    margin-bottom: 15px
+    margin-bottom: 15px;
+    /* stick below the floating main menu */
+    position: sticky;
+    top: 76px;
+    z-index: 1;
+    padding: 18px 0 8px;
+    margin-top: -15px;
+    border-radius: 20px;
+    background-color: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px)
 }
 
 .paper .round {
