@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
@@ -44,6 +44,12 @@ function getCircularProgress(value, status, classname, loading) {
 export default function Order(props) {
   const { name, orders = [], updateOrders, created } = props
   const [changingOrderId, setChaningOrderId] = useState(-1)
+  const [now, setNow] = useState(() => Date.now())
+
+  useEffect(() => {
+    const intervalId = setInterval(() => setNow(Date.now()), 5000)
+    return () => clearInterval(intervalId)
+  }, [])
 
   const ToggleStatus = (orderId) => async () => {
     setChaningOrderId(orderId)
@@ -56,8 +62,7 @@ export default function Order(props) {
     setChaningOrderId(-1)
   }
 
-  const now = new Date().getTime();
-  var items = orders.map(order => {
+  const items = orders.map(order => {
     const { name, comment, status, id, created, inFilter } = order
     let value = 0;
 

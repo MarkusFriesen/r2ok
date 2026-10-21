@@ -30,7 +30,7 @@ export default function OrderPage() {
   }, [productGroupInitialized, productIds])
 
   let numOfOrders = 0
-  var content = tables?.map(table => {
+  const content = tables?.map(table => {
     const { name, orders, id, firstCreated } = table
     numOfOrders += orders.length
     return <Order key={id} created={firstCreated} tableId={id} name={name} orders={orders} updateOrders={() => setRefreshTimestamp(new Date())} />

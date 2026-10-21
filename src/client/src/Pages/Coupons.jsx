@@ -7,8 +7,8 @@ import IconButton from '@mui/material/IconButton';
 import LinearProgress from '@mui/material/LinearProgress';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
-import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import ListItemText from '@mui/material/ListItemText';
 import Paper from '@mui/material/Paper';
 import Snackbar from '@mui/material/Snackbar';
@@ -16,7 +16,7 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import React, { useState } from 'react';
 import useCoupons from '../hooks/useCoupons';
-import Barcode from 'react-jsbarcode';
+import { ReactBarcode } from 'react-jsbarcode';
 import FileCopy from '@mui/icons-material/FileCopy';
 import copy from 'copy-to-clipboard';
 import SearchIcon from '@mui/icons-material/Search';
@@ -45,8 +45,8 @@ function Coupons() {
         <TextField
           variant="outlined"
           className="search"
-          InputProps={{
-            endAdornment: <SearchIcon />
+          slotProps={{
+            input: { endAdornment: <SearchIcon /> }
           }}
           label="Filter"
           value={filter}
@@ -63,26 +63,27 @@ function Coupons() {
       <List>
         {filteredCoupons.map(c => {
           return (
-            <ListItem key={c.id} dense button onClick={() => {
-              setSelectedCoupon(c)
-              setOpen(true)
-            }} >
-              <ListItemAvatar>
-                <div className="round">
-                  <Typography color="textPrimary" className="content" align="center" >
-                    {parseInt(c.value).toFixed(0)}€
-                  </Typography>
-                </div>
-              </ListItemAvatar>
-              <ListItemText id={c.id} primary={c?.name} secondary={c?.identifier} />
-              <ListItemSecondaryAction>
-                <IconButton edge="end" aria-label="comments" onClick={() => {
-                  setSelectedCoupon(c)
-                  handleCopy(c?.identifier)
-                }}>
-                  <FileCopy />
-                </IconButton>
-              </ListItemSecondaryAction>
+            <ListItem key={c.id} dense disablePadding secondaryAction={
+              <IconButton edge="end" aria-label="comments" onClick={() => {
+                setSelectedCoupon(c)
+                handleCopy(c?.identifier)
+              }}>
+                <FileCopy />
+              </IconButton>
+            }>
+              <ListItemButton dense onClick={() => {
+                setSelectedCoupon(c)
+                setOpen(true)
+              }} >
+                <ListItemAvatar>
+                  <div className="round">
+                    <Typography color="textPrimary" className="content" align="center" >
+                      {parseInt(c.value).toFixed(0)}€
+                    </Typography>
+                  </div>
+                </ListItemAvatar>
+                <ListItemText id={c.id} primary={c?.name} secondary={c?.identifier} />
+              </ListItemButton>
             </ListItem>
           )
         })}
@@ -94,7 +95,7 @@ function Coupons() {
       >
         <DialogTitle>{selectedCoupon?.name}</DialogTitle>
         <DialogContent>
-          <Barcode value={selectedCoupon?.identifier} options={{ format: 'EAN13' }} />
+          <ReactBarcode value={selectedCoupon?.identifier} options={{ format: 'EAN13' }} />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => handleCopy(selectedCoupon?.identifier)} color="secondary">Copy</Button>

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Outlet } from "react-router-dom";
-import ThemeProvider from '@mui/material/styles/ThemeProvider';
+import { ThemeProvider } from '@mui/material/styles';
 import Theme from './Theme';
 import Toolbar from '@mui/material/Toolbar';
 import AppBar from '@mui/material/AppBar';
