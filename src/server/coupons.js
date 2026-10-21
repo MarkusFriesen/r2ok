@@ -1,6 +1,7 @@
 const fs = require('fs');
 const config = require('./config')
 const winston = require('winston')
+const {createPersister} = require('./persist')
 
 let coupons = []
 let initialized = false
@@ -17,12 +18,10 @@ const updateCoupons = (data) => {
   persistCoupons()
 }
 
-const persistCoupons = () => {
-  fs.writeFile(config.storage.couponPath, JSON.stringify(coupons), (err) => {
-    if (!err) return
-    winston.error('[coupons] Failed to save state to file', err);
-  });
-}
+// Skips the write when the fetched coupons are identical to the stored ones
+const couponPersister = createPersister(config.storage.couponPath, () => coupons, config.persistDelaySeconds.coupons * 1000)
+
+const persistCoupons = () => couponPersister.schedule()
 
 const rehydrateCoupons = () => {
   if (initialized) return

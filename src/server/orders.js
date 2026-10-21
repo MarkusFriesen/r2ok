@@ -1,6 +1,7 @@
 const fs = require('fs');
 const config = require('./config')
 const winston = require('winston')
+const {createPersister} = require('./persist')
 
 let orders = {}
 let togoOrders = {}
@@ -78,16 +79,13 @@ const updateTogoOrders = (invoices) => {
   togoOrders = result
 }
 
-const persist = (filePath, data) => {
-  fs.writeFile(filePath, JSON.stringify(data), (err) => {
-    if (!err) return
-    winston.error(`[orders] Failed to save state to file ${filePath}`, err);
-  });
-}
+// Status changes are batched, a crash loses at most config.persistDelaySeconds of toggles
+const ordersPersister = createPersister(config.storage.filePath, () => orders, config.persistDelaySeconds.orders * 1000)
+const togoPersister = createPersister(config.storage.togoPath, () => togoOrders, config.persistDelaySeconds.togo * 1000)
 
 const persistOrders = () => {
-  persist(config.storage.filePath, orders)
-  persist(config.storage.togoPath, togoOrders)
+  ordersPersister.schedule()
+  togoPersister.schedule()
 }
 
 const rehydrate = (filePath) => {
