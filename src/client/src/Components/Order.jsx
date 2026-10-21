@@ -30,11 +30,17 @@ function getStatusIcon(status) {
   }
 }
 
+function getUrgencyColor(value) {
+  if (value >= 85) return "error"
+  if (value >= 50) return "warning"
+  return "success"
+}
+
 function getCircularProgress(value, status, classname, loading) {
   if (status === 2) return <React.Fragment />
   value = value > 100 ? 100 : value
   return <CircularProgress
-    color={value > 50 ? "secondary" : "primary"}
+    color={getUrgencyColor(value)}
     value={Number.parseInt(value)}
     variant={loading ? "indeterminate" : "determinate"}
     size={36}
@@ -75,7 +81,7 @@ export default function Order(props) {
 
     const labelId = `checkbox-list-label-${id}`;
     return (
-      <ListItemButton key={id} dense onClick={ToggleStatus(id)} disabled={changingOrderId === id} className="order-list-item-padding" >
+      <ListItemButton key={id} dense onClick={ToggleStatus(id)} disabled={changingOrderId === id} className={status === 2 ? "order-list-item-padding order-done" : "order-list-item-padding"} >
         <ListItemIcon>
           {getCircularProgress(value, status, "loading", changingOrderId === id)}
           {getStatusIcon(status)}
@@ -98,6 +104,10 @@ export default function Order(props) {
           }
           title={name}
           subheader={`${timestamp.toLocaleDateString(language, dateOptions)} ${timestamp.toLocaleTimeString(language, timeOptions)}`}
+          slotProps={{
+            title: { variant: "h6", fontWeight: 700, lineHeight: 1.2 },
+            subheader: { className: "timestamp" },
+          }}
         />
         <CardContent>
           <List className="order-list">

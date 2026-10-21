@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
 import { Outlet } from "react-router-dom";
 import { ThemeProvider } from '@mui/material/styles';
-import Theme from './Theme';
-import Toolbar from '@mui/material/Toolbar';
+import Theme, { glass } from './Theme';
 import AppBar from '@mui/material/AppBar';
-import Button from '@mui/material/Button';
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import { useNavigate, useLocation } from "react-router-dom";
 import './App.css';
 
@@ -20,21 +20,14 @@ function App() {
 
   return (
     <ThemeProvider theme={Theme}>
-      <AppBar position="static" className={"title"}>
-        <Toolbar>
-          <Button
-            size="large"
-            color={location.pathname === '/orders' ? "secondary" : "inherit"}
-            onClick={() => navigate("/orders")}>
-            Kitchen
-          </Button>
-          <Button
-            size="large"
-            color={location.pathname === '/coupons' ? "secondary" : "inherit"}
-            onClick={() => navigate("/coupons")}>
-            Coupons
-          </Button>
-        </Toolbar>
+      <AppBar position="sticky" className="nav" sx={glass(0.5)}>
+        <ToggleButtonGroup
+          exclusive
+          value={location.pathname}
+          onChange={(_, path) => path && navigate(path)}>
+          <ToggleButton value="/orders">Kitchen</ToggleButton>
+          <ToggleButton value="/coupons">Coupons</ToggleButton>
+        </ToggleButtonGroup>
       </AppBar>
       <Outlet />
     </ThemeProvider>

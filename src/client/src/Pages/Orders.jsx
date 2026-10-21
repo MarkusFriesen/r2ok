@@ -12,6 +12,19 @@ import Badge from '@mui/material/Badge';
 import FilterDialog from '../Components/FilterDialog';
 import "./Orders.css"
 
+// Masonry >= 2.9 drops empty columns, so a few cards would stretch across the
+// whole page. Pin every column to 1/N of the width like before.
+function FixedColumnsMasonry({ columnsCount = 1, children }) {
+  return (
+    <Masonry
+      columnsCount={columnsCount}
+      style={{ justifyContent: "flex-start" }}
+      itemStyle={{ flex: `0 0 ${100 / columnsCount}%`, minWidth: 0 }}>
+      {children}
+    </Masonry>
+  )
+}
+
 export default function OrderPage() {
 
   const [dontShowAll, setDontShowAll] = useState(true)
@@ -58,9 +71,9 @@ export default function OrderPage() {
         <ResponsiveMasonry
           columnsCountBreakPoints={{ 350: 1, 750: 2, 1280: 3, 1920: 4 }}
         >
-          <Masonry>
+          <FixedColumnsMasonry>
             {content}
-          </Masonry>
+          </FixedColumnsMasonry>
         </ResponsiveMasonry>
         <Snackbar
           anchorOrigin={{
@@ -87,7 +100,7 @@ export default function OrderPage() {
           setOpen={setOpenErrorDialog} />
       </div>
       <section className="float-right">
-        <IconButton color="inherit" onClick={() => setDialogOpen(true)}>
+        <IconButton className="glass-button" aria-label="filter" onClick={() => setDialogOpen(true)}>
           <Badge color="secondary" variant="dot" overlap="rectangular" invisible={dontShowAll && productIds.length === filteredProductGroup.length}>
             <FilterIcon />
           </Badge>

@@ -1,29 +1,36 @@
 .paper {
     max-width: 500px;
     margin: 25px auto;
-    padding-top: 15px
+    padding: 15px 8px 8px;
+    border-radius: 28px !important;
+    overflow: hidden;
 }
 
 .paper .search {
-    margin-left: 15px
+    margin-left: 8px
 }
 
 .paper .filter {
     width: 100%;
     display: grid;
-    grid-template: auto / auto 55px;
+    grid-template: auto / auto 64px;
+    align-items: center;
+    justify-items: center;
     margin-bottom: 15px
 }
 
 .paper .round {
-    background-color: #f50057;
-    border-radius: 1rem;
-
-    width: 35px;
-    padding: 5px
+    background: linear-gradient(135deg, #ff8a5c, #ff5e3a);
+    border-radius: 999px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 4px 12px rgba(255, 94, 58, 0.3);
+    width: 40px;
+    padding: 4px 6px
 }
 
 .paper .content {
     padding: 1px;
-    align-content: center
+    align-content: center;
+    color: #fff;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums
 }

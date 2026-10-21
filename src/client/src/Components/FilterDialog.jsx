@@ -61,7 +61,7 @@ export default function ConfirmationDialog(props) {
           label="Don't show fulfilled orders"
         />
         <br />
-        <Typography variant='h6'> Produt groups</Typography>
+        <Typography variant='h6'> Product groups</Typography>
         {productGroupsCheckboxes}
 
       </DialogContent>

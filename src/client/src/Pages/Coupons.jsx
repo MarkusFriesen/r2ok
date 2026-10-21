@@ -53,8 +53,8 @@ function Coupons() {
           onChange={(e) => setFilter(e.target.value)}
           disabled={loading}
         />
-        <IconButton disabled={loading}>
-          <RefreshIcon onClick={async () => await refresh()} />
+        <IconButton disabled={loading} aria-label="refresh" onClick={async () => await refresh()}>
+          <RefreshIcon />
         </IconButton>
       </div>
       {
@@ -77,7 +77,7 @@ function Coupons() {
               }} >
                 <ListItemAvatar>
                   <div className="round">
-                    <Typography color="textPrimary" className="content" align="center" >
+                    <Typography className="content" align="center" >
                       {parseInt(c.value).toFixed(0)}€
                     </Typography>
                   </div>
