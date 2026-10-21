@@ -11,6 +11,7 @@ import DoneIcon from '@mui/icons-material/Done';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import EmojiFoodBeverageIcon from '@mui/icons-material/EmojiFoodBeverage';
+import TakeoutDiningIcon from '@mui/icons-material/TakeoutDining';
 import CircularProgress from '@mui/material/CircularProgress';
 import axios from 'axios'
 import './Order.css'
@@ -18,6 +19,8 @@ import './Order.css'
 const dateOptions = { month: 'short', day: 'numeric' };
 const timeOptions = { hour: 'numeric', minute: 'numeric' };
 const language = window.navigator.language;
+// To-go cards start glowing once the customer has waited this long
+const togoOverdueMs = 15 * 60000;
 
 function getStatusIcon(status) {
   switch (status) {
@@ -48,7 +51,7 @@ function getCircularProgress(value, status, classname, loading) {
     className={classname} />
 }
 export default function Order(props) {
-  const { name, orders = [], updateOrders, created } = props
+  const { name, orders = [], updateOrders, created, togo } = props
   const [changingOrderId, setChaningOrderId] = useState(-1)
   const [now, setNow] = useState(() => Date.now())
 
@@ -69,7 +72,7 @@ export default function Order(props) {
   }
 
   const items = orders.map(order => {
-    const { name, comment, status, id, created, inFilter } = order
+    const { name, comment, status, id, created, inFilter, quantity } = order
     let value = 0;
 
     try {
@@ -86,20 +89,22 @@ export default function Order(props) {
           {getCircularProgress(value, status, "loading", changingOrderId === id)}
           {getStatusIcon(status)}
         </ListItemIcon>
-        <ListItemText id={labelId} primary={name} secondary={comment} />
+        <ListItemText id={labelId} primary={quantity > 1 ? `${quantity}× ${name}` : name} secondary={comment} />
         <section className={inFilter ? "" : "order-not-in-filter"} />
       </ListItemButton>
     );
   })
 
   const timestamp = new Date(created)
+  const open = orders.some(o => o.status !== 2)
+  const overdue = open && now - timestamp.getTime() >= togoOverdueMs
   return (
     <div className="root">
-      <Card className="card">
+      <Card className={togo ? `card togo${overdue ? " togo-overdue" : ""}` : "card"}>
         <CardHeader
           avatar={
-            <Avatar aria-label="table" className="avatar">
-              <EmojiFoodBeverageIcon />
+            <Avatar aria-label={togo ? "to-go" : "table"} className="avatar">
+              {togo ? <TakeoutDiningIcon /> : <EmojiFoodBeverageIcon />}
             </Avatar>
           }
           title={name}

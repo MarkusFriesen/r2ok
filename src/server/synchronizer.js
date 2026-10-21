@@ -1,6 +1,6 @@
 const axios = require('axios')
 const CronJob = require('cron').CronJob;
-const {updateOrders, initializeTables, rehydrateOrders, setLastError, initializeProducts} = require('./orders.js')
+const {updateOrders, updateTogoOrders, getTogoCutoff, initializeTables, rehydrateOrders, setLastError, initializeProducts} = require('./orders.js')
 const {rehydrateCoupons, updateCoupons} = require('./coupons.js')
 const config = require('./config.js')
 const winston = require('winston')
@@ -28,6 +28,7 @@ const job = new CronJob(config.fetch.orderCron, async () => {
       limit)
 
     updateOrders(allData)
+    updateTogoOrders(await getRecentInvoices())
   } catch (exception) {
 
     setLastError(new Date(), 500, exception)
@@ -98,6 +99,32 @@ const getPaginatedData = async (createUrlFromPagenumber, errorMessage, limit = 2
   } while (data && data.length === limit)
 
   return allData
+}
+
+// The api ignores the time of dateFrom and returns whole days, newest first.
+// Stop paging once we are past the to-go window
+const getRecentInvoices = async () => {
+  const cutoff = getTogoCutoff()
+  const from = new Date(cutoff)
+  const pad = (n) => `${n}`.padStart(2, '0')
+  const dateFrom = `${from.getFullYear()}-${pad(from.getMonth() + 1)}-${pad(from.getDate())}`
+  const limit = 50
+  let invoices = []
+  let offset = 0
+
+  do {
+    var {status, data} = await instance.get(
+      `document/invoice?dateFrom=${dateFrom}&items=true&testMode=${config.useTrainingData}&limit=${limit}&offset=${offset}`)
+
+    if (status !== 200) {
+      throw new Error(`Couldn't get invoice data. Status: ${status}`)
+    }
+
+    invoices = [...invoices, ...data.invoices]
+    offset += limit
+  } while (data.invoices.length === limit && new Date(invoices[invoices.length - 1].invoice_timestamp) >= cutoff)
+
+  return invoices
 }
 
 const getAllCoupons = () => {

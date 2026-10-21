@@ -44,9 +44,9 @@ export default function OrderPage() {
 
   let numOfOrders = 0
   const content = tables?.map(table => {
-    const { name, orders, id, firstCreated } = table
+    const { name, orders, id, firstCreated, togo } = table
     numOfOrders += orders.length
-    return <Order key={id} created={firstCreated} tableId={id} name={name} orders={orders} updateOrders={() => setRefreshTimestamp(new Date())} />
+    return <Order key={id} created={firstCreated} tableId={id} name={name} togo={togo} orders={orders} updateOrders={() => setRefreshTimestamp(new Date())} />
   })
 
   const [openErrorDialog, setOpenErrorDialog] = useState(false)

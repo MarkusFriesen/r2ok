@@ -3,6 +3,7 @@ const config = require('./config')
 const winston = require('winston')
 
 let orders = {}
+let togoOrders = {}
 let productsToProductGroup = {}
 let initialized = false
 let products = []
@@ -31,27 +32,87 @@ const updateOrders = (data) => {
   }, {})
 }
 
-const persistOrders = () => {
-  fs.writeFile(config.storage.filePath, JSON.stringify(orders), (err) => {
+const getTogoCutoff = () => Date.now() - config.togoWindowMinutes * 60000
+
+// Invoices are sorted newest first, invoices of a to-go table become to-go orders
+const updateTogoOrders = (invoices) => {
+  const cutoff = getTogoCutoff()
+  const cancelledInvoiceIds = invoices.map(i => i.invoice_reference_id).filter(Boolean)
+  const result = {...togoOrders}
+
+  invoices
+    .filter(invoice => tables[invoice.table_id]?.togo && !invoice.invoice_reference_id && !invoice.invoice_deleted_at)
+    .forEach(invoice => {
+      const created = new Date(invoice.invoice_timestamp)
+      invoice.items.filter(item => !item.item_retour).forEach(item => {
+        const id = `togo-${item.item_id}`
+        // Only pick up orders of the last minutes, but keep the ones we already know
+        if (created < cutoff && !result[id]) return
+
+        result[id] = {
+          status: 0,
+          ...result[id],
+          id,
+          name: item.item_name,
+          comment: item.item_comment,
+          number: invoice.invoice_number,
+          quantity: item.item_qty,
+          created: created,
+          updated: true,
+          productId: item.product_id,
+          tableId: `togo-${invoice.invoice_id}`,
+          invoiceId: invoice.invoice_id,
+          tableName: `${tables[invoice.table_id].name} #${invoice.invoice_number}`
+        }
+      })
+    })
+
+  // Drop cancelled invoices and finished orders older than the to-go window
+  Object.values(result).forEach(order => {
+    if (cancelledInvoiceIds.includes(order.invoiceId)
+      || (order.status === 2 && new Date(order.created) < cutoff)) {
+      delete result[order.id]
+    }
+  })
+
+  togoOrders = result
+}
+
+const persist = (filePath, data) => {
+  fs.writeFile(filePath, JSON.stringify(data), (err) => {
     if (!err) return
-    winston.error('[orders] Failed to save state to file', err);
+    winston.error(`[orders] Failed to save state to file ${filePath}`, err);
   });
+}
+
+const persistOrders = () => {
+  persist(config.storage.filePath, orders)
+  persist(config.storage.togoPath, togoOrders)
+}
+
+const rehydrate = (filePath) => {
+  try {
+    return JSON.parse(fs.readFileSync(filePath));
+  } catch (err) {
+    // Nothing has been saved yet, the file is created on the first status change
+    if (err.code === 'ENOENT') return
+    winston.error(`[orders] Failed to rehydrate ${filePath}`, err);
+  }
 }
 
 const rehydrateOrders = () => {
   if (initialized) return
-  try {
-    orders = JSON.parse(fs.readFileSync(config.storage.filePath));
-    initialized = true
-  } catch (err) {
-    winston.error('[orders] Failed to rehydrate orders', err);
-    return;
-  }
+  togoOrders = rehydrate(config.storage.togoPath) || {}
+  const storedOrders = rehydrate(config.storage.filePath)
+  if (!storedOrders) return
+  orders = storedOrders
+  initialized = true
 }
 
 const initializeTables = (data) => {
   data.forEach(t => {
-    tables[t.table_id] = {name: t.table_name, updated: false}
+    // Tables in checkout mode are invoiced immediately, that's the to-go table
+    tables[t.table_id] = {name: t.table_name, updated: false, togo: t.table_checkoutMode}
   })
 }
 
@@ -63,11 +124,12 @@ const initializeProducts = (data) => {
 }
 
 const toggleStatus = (orderId) => {
-  if (!orders[orderId]) {
+  const order = orders[orderId] || togoOrders[orderId]
+  if (!order) {
     return false
   }
 
-  orders[orderId].status = (orders[orderId].status + 1) % 3
+  order.status = (order.status + 1) % 3
 
   persistOrders()
   return true
@@ -75,10 +137,12 @@ const toggleStatus = (orderId) => {
 
 const getOrders = () => {return {...orders}}
 
+// Every to-go invoice gets its own card
 const getTablesWithOrders = () =>
-  Object.values(orders).reduce((pv, cv) => {
+  [...Object.values(orders), ...Object.values(togoOrders)].reduce((pv, cv) => {
     if (!pv[cv.tableId]) {
-      pv[cv.tableId] = {...tables[cv.tableId], orders: {[cv.id]: {...cv}}}
+      const table = cv.invoiceId ? {name: cv.tableName, togo: true} : tables[cv.tableId]
+      pv[cv.tableId] = {...table, orders: {[cv.id]: {...cv}}}
     } else {
       pv[cv.tableId].orders[cv.id] = cv
     }
@@ -97,6 +161,8 @@ module.exports = {
   toggleOrder: toggleStatus,
   initializeTables,
   updateOrders,
+  updateTogoOrders,
+  getTogoCutoff,
   getOrders,
   getTablesWithOrders,
   rehydrateOrders,
