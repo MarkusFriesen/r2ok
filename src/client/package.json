@@ -22,9 +22,11 @@
   "devDependencies": {
     "@babel/core": "^7.29.7",
     "@rolldown/plugin-babel": "^0.2.4",
+    "@vite-pwa/assets-generator": "^2.0.0",
     "@vitejs/plugin-react": "^6.1.2",
     "babel-plugin-react-compiler": "^1.0.0",
     "oxlint": "^1.89.0",
+    "sharp": "^0.35.5",
     "vite": "^8.3.5"
   },
   "scripts": {
@@ -33,7 +35,8 @@
     "preview": "vite preview",
     "deploy": "rm -r ../server/public && cp -r ./dist ../server/public",
     "deployW": "(if exist \"..\\server\\public\" rmdir ..\\server\\public /Q/S) && xcopy dist ..\\server\\public /E/I/Y/Q",
-    "lint": "oxlint"
+    "lint": "oxlint",
+    "splash": "node scripts/generate-splash.mjs"
   },
   "browserslist": {
     "production": [

@@ -1,0 +1,15 @@
+{
+  "id": "/",
+  "name": "Ready2Order Kitchen",
+  "short_name": "R2OK",
+  "description": "Ready2Order Kitchen",
+  "lang": "en",
+  "start_url": "/#/orders",
+  "scope": "/",
+  "display": "standalone",
+  "theme_color": "#eef3f7",
+  "background_color": "#eef3f7",
+  "icons": [
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

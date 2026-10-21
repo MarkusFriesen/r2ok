@@ -6,8 +6,8 @@
 /* Floating glass button, aligned with the nav pill */
 .float-right {
     position: fixed;
-    top: 12px;
-    right: 16px;
+    top: calc(12px + env(safe-area-inset-top));
+    right: calc(16px + env(safe-area-inset-right));
     z-index: 1101;
 }
 
@@ -23,8 +23,11 @@
     transition: background-color 150ms, transform 120ms;
 }
 
-.float-right .glass-button:hover {
-    background-color: rgba(255, 255, 255, 0.75);
+/* Touch screens would keep the hover style after a tap */
+@media (hover: hover) {
+    .float-right .glass-button:hover {
+        background-color: rgba(255, 255, 255, 0.75);
+    }
 }
 
 .float-right .glass-button:active {

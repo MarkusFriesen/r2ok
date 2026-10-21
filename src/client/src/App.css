@@ -1,28 +1,53 @@
+html {
+    /* No double-tap zoom delay, no grey flash on tap, no font inflation in landscape */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
 body {
     margin: 0;
     min-height: 100dvh;
     background-color: #eef3f7;
     font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
+    /* No rubber band or pull-to-refresh, the app polls on its own */
+    overscroll-behavior: none;
 }
 
-/* Colorful backdrop for the glass surfaces. A fixed layer instead of
-   background-attachment: fixed, which is broken on iOS Safari */
+/* Keep content out of the notch and the home indicator (viewport-fit=cover) */
+#root {
+    padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+/* App chrome behaves like native controls: no text selection or long-press callout */
+.nav,
+.float-right,
+.card {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+}
+
+/* Muted backdrop for the glass surfaces, just enough tonal variation for the
+   blur to read. A fixed layer instead of background-attachment: fixed, which
+   is broken on iOS Safari */
 body::before {
     content: "";
     position: fixed;
     inset: 0;
     z-index: -1;
     background:
-        radial-gradient(60vmax 60vmax at 0% 0%, #9fd8ff 0%, transparent 55%),
-        radial-gradient(50vmax 50vmax at 100% 25%, #ffc3a0 0%, transparent 50%),
-        radial-gradient(60vmax 60vmax at 50% 110%, #c7b8ff 0%, transparent 55%);
+        radial-gradient(60vmax 60vmax at 0% 0%, #c4d4e2 0%, transparent 55%),
+        radial-gradient(50vmax 50vmax at 100% 25%, #e0d9d1 0%, transparent 50%),
+        radial-gradient(60vmax 60vmax at 50% 110%, #cdd1dc 0%, transparent 55%);
 }
 
 .nav {
-    top: 12px;
+    top: calc(12px + env(safe-area-inset-top));
     width: fit-content !important;
-    margin: 12px auto 0;
+    margin: calc(12px + env(safe-area-inset-top)) auto 0;
     padding: 4px;
     border-radius: 999px;
 }
