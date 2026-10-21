@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import useSlidingIndicator from './hooks/useSlidingIndicator';
 import { Outlet } from "react-router-dom";
 import { ThemeProvider } from '@mui/material/styles';
 import Theme, { glass } from './Theme';
@@ -12,6 +13,8 @@ function App() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const [groupProps, indicator] = useSlidingIndicator(location.pathname);
+
   useEffect(() => {
     if (location.pathname === "/")
       navigate("orders")
@@ -22,9 +25,11 @@ function App() {
     <ThemeProvider theme={Theme}>
       <AppBar position="sticky" className="nav" sx={glass(0.5)}>
         <ToggleButtonGroup
+          {...groupProps}
           exclusive
           value={location.pathname}
           onChange={(_, path) => path && navigate(path)}>
+          {indicator}
           <ToggleButton value="/orders">Kitchen</ToggleButton>
           <ToggleButton value="/coupons">Coupons</ToggleButton>
         </ToggleButtonGroup>
