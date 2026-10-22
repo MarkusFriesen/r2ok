@@ -8,6 +8,7 @@ html {
 
 body {
     margin: 0;
+    min-height: 100vh;
     min-height: 100dvh;
     background-color: #eef3f7;
     font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -65,11 +66,30 @@ body::before {
     pointer-events: none;
 }
 
-/* Browsers without backdrop-filter (legacy build) get near-opaque surfaces */
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+/* Old Safari (iOS 12) technically has backdrop-filter, but renders the large
+   blur/grayscale layers wrongly. `inset` shipped in Safari 14.1, so its absence
+   marks the legacy build: drop the blur and use near-opaque surfaces */
+@supports not (inset: 0) {
     .MuiPaper-root,
-    .glass-button {
+    .MuiBackdrop-root,
+    .MuiSnackbarContent-root,
+    .MuiOutlinedInput-root,
+    .glass-button,
+    .filter,
+    .order-not-in-filter {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+
+    .MuiPaper-root,
+    .glass-button,
+    .filter {
         background-color: rgba(255, 255, 255, 0.94) !important;
+    }
+
+    .card .order-not-in-filter {
+        background-color: rgba(238, 243, 247, 0.6);
+        pointer-events: none;
     }
 }
 

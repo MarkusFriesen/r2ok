@@ -6,9 +6,11 @@ import legacy from '@vitejs/plugin-legacy'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react(), babel({ presets: [reactCompilerPreset()] }), legacy({
-    targets: ['defaults', 'not IE 11'],
+    // Legacy bundle only loads on browsers without module support (e.g. iOS 12 Safari)
+    targets: ['iOS >= 12'],
   })],
   build: {
+    cssTarget: 'safari12',
     rolldownOptions: {
       output: {
         // Keep rarely changing vendor code in separate, long-cacheable chunks
