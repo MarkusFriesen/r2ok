@@ -7,13 +7,16 @@ import AppBar from '@mui/material/AppBar';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import { useNavigate, useLocation } from "react-router-dom";
+import useTranslation from './hooks/useTranslation';
 import './App.css';
 
 function App() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t, language } = useTranslation();
 
-  const [groupProps, indicator] = useSlidingIndicator(location.pathname);
+  // Labels change width with the language, the highlight has to follow
+  const [groupProps, indicator] = useSlidingIndicator(`${location.pathname}|${language}`);
 
   useEffect(() => {
     if (location.pathname === "/")
@@ -23,15 +26,15 @@ function App() {
 
   return (
     <ThemeProvider theme={Theme}>
-      <AppBar position="sticky" className="nav" sx={glass(0.5)}>
+      <AppBar position="sticky" className="nav" sx={glass(0.35)}>
         <ToggleButtonGroup
           {...groupProps}
           exclusive
           value={location.pathname}
           onChange={(_, path) => path && navigate(path)}>
           {indicator}
-          <ToggleButton value="/orders">Kitchen</ToggleButton>
-          <ToggleButton value="/coupons">Coupons</ToggleButton>
+          <ToggleButton value="/orders">{t('nav.kitchen')}</ToggleButton>
+          <ToggleButton value="/coupons">{t('nav.coupons')}</ToggleButton>
         </ToggleButtonGroup>
       </AppBar>
       <Outlet />

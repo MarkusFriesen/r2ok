@@ -21,10 +21,12 @@ import FileCopy from '@mui/icons-material/FileCopy';
 import copy from 'copy-to-clipboard';
 import SearchIcon from '@mui/icons-material/Search';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import Settings from '../Components/Settings';
+import useTranslation from '../hooks/useTranslation';
 import "./Coupons.css"
 
 function Coupons() {
-
+  const { t } = useTranslation()
   const [filter, setFilter] = useState('')
   const [filteredCoupons, loading, refresh] = useCoupons(filter)
   const [open, setOpen] = useState(false)
@@ -40,75 +42,78 @@ function Coupons() {
   }
 
   return (
-    <Paper className="paper">
-      <div className="filter" >
-        <TextField
-          variant="outlined"
-          className="search"
-          slotProps={{
-            input: { endAdornment: <SearchIcon /> }
-          }}
-          label="Filter"
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-          disabled={loading}
+    <>
+      <Paper className="paper">
+        <div className="filter" >
+          <TextField
+            variant="outlined"
+            className="search"
+            slotProps={{
+              input: { endAdornment: <SearchIcon /> }
+            }}
+            label={t('coupons.filter')}
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            disabled={loading}
+          />
+          <IconButton disabled={loading} aria-label={t('coupons.refresh')} onClick={async () => await refresh()}>
+            <RefreshIcon />
+          </IconButton>
+        </div>
+        {
+          loading ? <LinearProgress /> : undefined
+        }
+        <List>
+          {filteredCoupons.map(c => {
+            return (
+              <ListItem key={c.id} dense disablePadding secondaryAction={
+                <IconButton edge="end" aria-label={t('coupons.copyCode')} onClick={() => {
+                  setSelectedCoupon(c)
+                  handleCopy(c?.identifier)
+                }}>
+                  <FileCopy />
+                </IconButton>
+              }>
+                <ListItemButton dense onClick={() => {
+                  setSelectedCoupon(c)
+                  setOpen(true)
+                }} >
+                  <ListItemAvatar>
+                    <div className="round">
+                      <Typography className="content" align="center" >
+                        {parseInt(c.value).toFixed(0)}€
+                      </Typography>
+                    </div>
+                  </ListItemAvatar>
+                  <ListItemText id={c.id} primary={c?.name} secondary={c?.identifier} />
+                </ListItemButton>
+              </ListItem>
+            )
+          })}
+        </List>
+  
+        <Dialog
+          open={open}
+          onClose={handleClose}
+        >
+          <DialogTitle>{selectedCoupon?.name}</DialogTitle>
+          <DialogContent>
+            <ReactBarcode value={selectedCoupon?.identifier} options={{ format: 'EAN13' }} />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => handleCopy(selectedCoupon?.identifier)} color="secondary">{t('common.copy')}</Button>
+            <Button onClick={handleClose} color="primary">{t('common.close')}</Button>
+          </DialogActions>
+        </Dialog>
+        <Snackbar
+          open={showSnackbar}
+          onClose={closeSnackbar}
+          message={t('coupons.copied', { code: selectedCoupon?.identifier })}
+          autoHideDuration={3000}
         />
-        <IconButton disabled={loading} aria-label="refresh" onClick={async () => await refresh()}>
-          <RefreshIcon />
-        </IconButton>
-      </div>
-      {
-        loading ? <LinearProgress /> : undefined
-      }
-      <List>
-        {filteredCoupons.map(c => {
-          return (
-            <ListItem key={c.id} dense disablePadding secondaryAction={
-              <IconButton edge="end" aria-label="comments" onClick={() => {
-                setSelectedCoupon(c)
-                handleCopy(c?.identifier)
-              }}>
-                <FileCopy />
-              </IconButton>
-            }>
-              <ListItemButton dense onClick={() => {
-                setSelectedCoupon(c)
-                setOpen(true)
-              }} >
-                <ListItemAvatar>
-                  <div className="round">
-                    <Typography className="content" align="center" >
-                      {parseInt(c.value).toFixed(0)}€
-                    </Typography>
-                  </div>
-                </ListItemAvatar>
-                <ListItemText id={c.id} primary={c?.name} secondary={c?.identifier} />
-              </ListItemButton>
-            </ListItem>
-          )
-        })}
-      </List>
-
-      <Dialog
-        open={open}
-        onClose={handleClose}
-      >
-        <DialogTitle>{selectedCoupon?.name}</DialogTitle>
-        <DialogContent>
-          <ReactBarcode value={selectedCoupon?.identifier} options={{ format: 'EAN13' }} />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => handleCopy(selectedCoupon?.identifier)} color="secondary">Copy</Button>
-          <Button onClick={handleClose} color="primary">Close</Button>
-        </DialogActions>
-      </Dialog>
-      <Snackbar
-        open={showSnackbar}
-        onClose={closeSnackbar}
-        message={`Copied ${selectedCoupon?.identifier} to clipboard `}
-        autoHideDuration={3000}
-      />
-    </Paper>
+      </Paper>
+      <Settings />
+    </>
   );
 }
 export default Coupons;

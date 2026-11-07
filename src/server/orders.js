@@ -153,7 +153,16 @@ const getProducts = () => products
 let lastError = {}
 
 const getLastError = () => lastError
-const setLastError = (date, code, error) => lastError = {date, error, code}
+// Only plain fields: a raw axios error serializes its request config, which
+// contains the ready2order Authorization header, and this is sent to the client
+const setLastError = (date, code, error) => lastError = {
+  date,
+  code,
+  message: error?.message ?? String(error),
+  status: error?.response?.status,
+}
+// After a successful sync the old error is no longer relevant
+const clearLastError = () => lastError = {}
 
 module.exports = {
   toggleOrder: toggleStatus,
@@ -166,6 +175,7 @@ module.exports = {
   rehydrateOrders,
   getLastError,
   setLastError,
+  clearLastError,
   initializeProducts,
   getProductsToProductGroup,
   getProducts

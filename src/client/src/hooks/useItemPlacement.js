@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 
 const DONE = 2
 // Items stay in place for a while after a toggle so a mis-tap can be undone where it happened
-export const moveDelayMs = 8000
+export const moveDelayMs = 5000
 
 // Decides whether an item is shown in the open list or in the collapsed
 // "completed" section. Items already completed on first sight go there right away.

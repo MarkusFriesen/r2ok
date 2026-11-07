@@ -1,19 +1,13 @@
 import React from 'react';
-import Button from '@mui/material/Button';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
-import Dialog from '@mui/material/Dialog';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Typography from '@mui/material/Typography';
+import useTranslation from '../hooks/useTranslation';
 
-export default function ConfirmationDialog(props) {
-  const { onClose, dontShowAll, setDontShowAll, filteredProductGroup, setFilteredProductGroup, open, productGroups } = props;
-
-  const handleOk = () => {
-    onClose();
-  };
+// Order filters, shown as a section of the settings dialog
+export default function FilterSettings(props) {
+  const { dontShowAll, setDontShowAll, filteredProductGroup, setFilteredProductGroup, productGroups } = props;
+  const { t } = useTranslation();
 
   const handleChange = setter => (event) => {
     setter(event.target.checked);
@@ -43,33 +37,20 @@ export default function ConfirmationDialog(props) {
   }
 
   return (
-    <Dialog
-      aria-labelledby="confirmation-dialog-title"
-      open={open}
-      onClose={onClose}
-    >
-      <DialogTitle id="confirmation-dialog-title">Filter</DialogTitle>
-      <DialogContent >
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={dontShowAll}
-              onChange={handleChange(setDontShowAll)}
-              name="showAll"
-            />
-          }
-          label="Don't show fulfilled orders"
-        />
-        <br />
-        <Typography variant='h6'> Product groups</Typography>
-        {productGroupsCheckboxes}
-
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleOk} color="primary">
-          Close
-        </Button>
-      </DialogActions>
-    </Dialog>
+    <>
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={dontShowAll}
+            onChange={handleChange(setDontShowAll)}
+            name="showAll"
+          />
+        }
+        label={t('settings.hideFulfilled')}
+      />
+      <br />
+      <Typography variant='h6'>{t('settings.productGroups')}</Typography>
+      {productGroupsCheckboxes}
+    </>
   );
 }

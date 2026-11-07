@@ -6,8 +6,10 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import useErrorMessages from '../hooks/useErrorMessages';
+import useTranslation from '../hooks/useTranslation';
 
 export default function ErrorDialog({ open, setOpen }) {
+  const { t } = useTranslation()
   const { title, details } = useErrorMessages(open)
 
   const handleClose = () => {
@@ -25,12 +27,12 @@ export default function ErrorDialog({ open, setOpen }) {
         <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            {JSON.stringify(details ?? {})}
+            {details}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="secondary" autoFocus>
-            Close
+            {t('common.close')}
           </Button>
         </DialogActions>
       </Dialog>

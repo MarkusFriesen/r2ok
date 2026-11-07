@@ -6,16 +6,19 @@
 }
 
 .card .avatar {
-    background: rgba(10, 36, 51, 0.08);
+    background: rgba(255, 255, 255, 0.5);
     color: #0a2433;
     border-radius: 14px;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
-/* To-go customers wait at the counter, warm accent so the card stands out */
+/* To-go customers wait at the counter, warm accent so the card stands out.
+   Keeps the glass sheen from the theme on top of the tint */
 .card.togo {
-    background-image: linear-gradient(160deg, rgba(255, 107, 61, 0.08), rgba(255, 107, 61, 0.02) 60%);
-    border-color: rgba(255, 107, 61, 0.3);
+    background-image:
+        linear-gradient(160deg, rgba(255, 140, 100, 0.22), rgba(255, 140, 100, 0.04) 60%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.05) 70%);
+    border-color: rgba(255, 160, 120, 0.6);
 }
 
 .card.togo .avatar {
@@ -24,12 +27,12 @@
 }
 
 .card.togo .MuiCardHeader-title {
-    color: #b8532f;
+    color: #a3461f;
 }
 
 /* Waiting for 15min and still open: subtle glow and a pulsing avatar */
 .card.togo-overdue {
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 10px 40px rgba(255, 107, 61, 0.12);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85), 0 10px 40px rgba(255, 107, 61, 0.22);
 }
 
 .card.togo-overdue .avatar {
@@ -65,7 +68,7 @@
 }
 
 /* Dim the content only, so the move progress bar keeps its full color */
-.card .order-done > .MuiListItemIcon-root,
+.card .order-done > .MuiListItemIcon-root > .MuiSvgIcon-root,
 .card .order-done > .MuiListItemText-root {
     opacity: 0.5;
 }
@@ -88,8 +91,8 @@
     position: relative;
     overflow: hidden;
     border-radius: 14px;
-    background-color: rgba(255, 255, 255, 0.45);
-    border: 1px solid rgba(255, 255, 255, 0.6);
+    background-color: rgba(255, 255, 255, 0.38);
+    border: 1px solid rgba(255, 255, 255, 0.55);
 }
 
 /* Every row draws a hairline on top, the first one is clipped by the group */
@@ -120,32 +123,28 @@
     border-radius: 0;
 }
 
-/* Countdown until a toggled item slides into the other section, lines up with the hairline */
-.card .order-move-progress {
-    position: absolute;
-    bottom: 3px;
-    left: 46px;
-    right: 14px;
-    height: 3px;
-    border-radius: 999px;
-    transform-origin: left;
-    animation-name: order-move-progress;
-    animation-timing-function: linear;
-    animation-fill-mode: forwards;
-    pointer-events: none;
+/* Countdown ring around the checkbox until a toggled item slides into the other section.
+   Animations override MUI's inline dash offset; 119.38px is the circumference
+   of the r=19 circle CircularProgress draws for thickness 6 */
+.card .order-move-ring .MuiCircularProgress-circle {
+    transition: none;
+    animation: order-move-ring var(--move-duration) linear forwards;
 }
 
-.card .order-move-progress.down {
-    background-color: #2fb67c;
+@keyframes order-move-ring {
+    from { stroke-dashoffset: 119.38px; }
+    to { stroke-dashoffset: 0; }
 }
 
-.card .order-move-progress.up {
-    background-color: #0a2433;
+/* The urgency arc grows from its end back to the top, ending exactly as the
+   normal ring looks. --arc is the arc length, set from the urgency value */
+.card .order-move-ring.regrow .MuiCircularProgress-circle {
+    animation-name: order-move-regrow;
 }
 
-@keyframes order-move-progress {
-    from { transform: scaleX(0); }
-    to { transform: scaleX(1); }
+@keyframes order-move-regrow {
+    from { stroke-dasharray: 0px 200px; stroke-dashoffset: calc(-1 * var(--arc)); }
+    to { stroke-dasharray: var(--arc) 200px; stroke-dashoffset: 0px; }
 }
 
 /* MUI pads the last CardContent extra deep */
@@ -158,8 +157,8 @@
     margin-top: 10px;
     overflow: hidden;
     border-radius: 14px;
-    background-color: rgba(255, 255, 255, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.6);
+    background-color: rgba(255, 255, 255, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.55);
 }
 
 .card .order-done-section .order-group {
@@ -181,7 +180,7 @@
     font: inherit;
     font-size: 0.875rem;
     font-weight: 500;
-    color: rgba(10, 36, 51, 0.6);
+    color: rgba(10, 36, 51, 0.68);
 }
 
 @media (hover: hover) {

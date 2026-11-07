@@ -1,5 +1,9 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import axios from 'axios'
+import { moveDelayMs } from './useItemPlacement'
+
+// Countdown plus time for the slide into the completed section
+const hideDelayMs = moveDelayMs + 1000
 
 function sortOrdersByCreated(a, b) {
   if (a.created > b.created) return 1
@@ -18,8 +22,13 @@ export default function useOrders(dontShowAll, filteredProductGroups) {
 
   const [refreshTimeStamp, setRefreshTimestamp] = useState(new Date())
   const [tables, setTables] = useState([])
+  // True once the first orders arrived, until then an empty list means "still loading"
+  const [initialized, setInitialized] = useState(false)
   const [productGroups, setProductGroups] = useState({})
   const [productIdToProductGroup, setProductIdToProductGroup] = useState({})
+  // Table id -> when all of its items were first seen completed
+  const completedSince = useRef(new Map())
+  const loaded = useRef(false)
 
   function FilterData(data, table) {
     const allOrders = []
@@ -70,6 +79,8 @@ export default function useOrders(dontShowAll, filteredProductGroups) {
 
   useEffect(() => {
     let disposed = false
+    const hideTimers = []
+    const doneSince = completedSince.current
 
     async function getOrders() {
       const { status, data } = await axios.get('/api/orders')
@@ -88,13 +99,28 @@ export default function useOrders(dontShowAll, filteredProductGroups) {
           // Apply Filter
           let [filteredOrders, firstCreated] = FilterData(data, table, filteredProductGroups)
 
-          if ((!dontShowAll || !filteredOrders.every(o => o.status === 2))) {
+          const allDone = filteredOrders.every(o => o.status === 2)
+          if (!allDone) {
+            doneSince.delete(table)
+          } else if (!doneSince.has(table)) {
+            // Completed before the page loaded, nothing left to animate
+            doneSince.set(table, loaded.current ? Date.now() : -Infinity)
+          }
+
+          // Keep a just completed table around so its last item can count down and slide
+          const remaining = doneSince.get(table) + hideDelayMs - Date.now()
+          if (!dontShowAll || !allDone || remaining > 0) {
             result.push({ id: table, ...data[table], orders: filteredOrders, firstCreated })
+          }
+          if (dontShowAll && allDone && remaining > 0) {
+            hideTimers.push(setTimeout(getOrders, remaining))
           }
         }
       }
+      loaded.current = true
       result.sort(sortTables)
       setTables(result)
+      setInitialized(true)
     }
 
     getOrders(() => disposed)
@@ -106,9 +132,10 @@ export default function useOrders(dontShowAll, filteredProductGroups) {
     return () => {
       disposed = true
       clearInterval(intervalId)
+      hideTimers.forEach(clearTimeout)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dontShowAll, filteredProductGroups.length, refreshTimeStamp])
 
-  return { tables, setRefreshTimestamp, productGroups, productIdToProductGroup }
+  return { tables, initialized, setRefreshTimestamp, productGroups, productIdToProductGroup }
 }

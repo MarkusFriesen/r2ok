@@ -1,6 +1,6 @@
 const axios = require('axios')
 const CronJob = require('cron').CronJob;
-const {updateOrders, updateTogoOrders, getTogoCutoff, initializeTables, rehydrateOrders, setLastError, initializeProducts} = require('./orders.js')
+const {updateOrders, updateTogoOrders, getTogoCutoff, initializeTables, rehydrateOrders, setLastError, clearLastError, initializeProducts} = require('./orders.js')
 const {rehydrateCoupons, updateCoupons} = require('./coupons.js')
 const config = require('./config.js')
 const winston = require('winston')
@@ -29,6 +29,7 @@ const job = new CronJob(config.fetch.orderCron, async () => {
 
     updateOrders(allData)
     updateTogoOrders(await getRecentInvoices())
+    clearLastError()
   } catch (exception) {
 
     setLastError(new Date(), 500, exception)

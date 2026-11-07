@@ -19,14 +19,16 @@ import ButtonBase from '@mui/material/ButtonBase';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import axios from 'axios'
 import useItemPlacement, { moveDelayMs } from '../hooks/useItemPlacement';
+import useTranslation from '../hooks/useTranslation';
 import './Order.css'
 
 const dateOptions = { month: 'short', day: 'numeric' };
 const timeOptions = { hour: 'numeric', minute: 'numeric' };
-const language = window.navigator.language;
 
 // To-go cards start glowing once the customer has waited this long
 const togoOverdueMs = 15 * 60000;
+// CircularProgress draws an r=19 circle for thickness 6 (viewBox 44)
+const ringCircumference = 2 * Math.PI * 19;
 
 function getStatusIcon(status) {
   switch (status) {
@@ -45,8 +47,8 @@ function getUrgencyColor(value) {
   return "success"
 }
 
-function getCircularProgress(value, status, classname, loading) {
-  if (status === 2) return <React.Fragment />
+function getCircularProgress(value, status, classname, loading, forceVisible) {
+  if (status === 2 && !forceVisible) return <React.Fragment />
   value = value > 100 ? 100 : value
   return <CircularProgress
     color={getUrgencyColor(value)}
@@ -58,6 +60,7 @@ function getCircularProgress(value, status, classname, loading) {
 }
 export default function Order(props) {
   const { name, orders = [], updateOrders, created, togo } = props
+  const { t, language } = useTranslation()
   const [changingOrderId, setChaningOrderId] = useState(-1)
   const [now, setNow] = useState(() => Date.now())
   const [showDone, setShowDone] = useState(false)
@@ -91,20 +94,39 @@ export default function Order(props) {
       console.error("Error creating difference: ", e)
     }
 
+    const urgency = Math.min(100, Number(value) || 0)
+    const completing = isMoving(order) && status === 2
+    const reopening = isMoving(order) && status !== 2
     const labelId = `checkbox-list-label-${id}`;
     return (
       <ListItemButton dense onClick={ToggleStatus(id)} disabled={changingOrderId === id} className={status === 2 ? "order-list-item-padding order-done" : "order-list-item-padding"} >
         <ListItemIcon>
-          {getCircularProgress(value, status, "loading", changingOrderId === id)}
+          {reopening
+            // Reopened: the urgency ring grows back backwards until the item slides up
+            ? <CircularProgress
+              variant="determinate"
+              value={urgency}
+              size={36}
+              thickness={6}
+              color={getUrgencyColor(urgency)}
+              className="loading order-move-ring regrow"
+              style={{ "--move-duration": `${moveDelayMs}ms`, "--arc": `${(ringCircumference * urgency / 100).toFixed(3)}px` }} />
+            : getCircularProgress(value, status, "loading", changingOrderId === id, completing)}
+          {completing && (
+            // Completed: green covers the urgency ring until the item slides down
+            <CircularProgress
+              variant="determinate"
+              value={100}
+              size={36}
+              thickness={6}
+              color="success"
+              className="loading order-move-ring"
+              style={{ "--move-duration": `${moveDelayMs}ms` }} />
+          )}
           {getStatusIcon(status)}
         </ListItemIcon>
         <ListItemText id={labelId} primary={quantity > 1 ? `${quantity}× ${name}` : name} secondary={comment} />
         <section className={inFilter ? "" : "order-not-in-filter"} />
-        {isMoving(order) && (
-          <span
-            className={status === 2 ? "order-move-progress down" : "order-move-progress up"}
-            style={{ animationDuration: `${moveDelayMs}ms` }} />
-        )}
       </ListItemButton>
     );
   }
@@ -132,7 +154,7 @@ export default function Order(props) {
       <Card className={togo ? `card togo${overdue ? " togo-overdue" : ""}` : "card"}>
         <CardHeader
           avatar={
-            <Avatar aria-label={togo ? "to-go" : "table"} className="avatar">
+            <Avatar aria-label={togo ? t('orders.togo') : t('orders.table')} className="avatar">
               {togo ? <TakeoutDiningIcon /> : <EmojiFoodBeverageIcon />}
             </Avatar>
           }
@@ -151,7 +173,7 @@ export default function Order(props) {
             <section className="order-done-section">
               <ButtonBase className="order-done-header" onClick={() => setShowDone(!showDone)} aria-expanded={showDone}>
                 <DoneAllIcon className="order-done-icon" />
-                <span className="order-done-label">Completed</span>
+                <span className="order-done-label">{t('orders.completed')}</span>
                 <span className="order-done-count">{doneCount}</span>
                 <ExpandMoreIcon fontSize="small" className={showDone ? "order-done-chevron open" : "order-done-chevron"} />
               </ButtonBase>

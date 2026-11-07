@@ -7,9 +7,9 @@ import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import ErrorDialog from '../Components/ErrorDialog';
 import useOrders from '../hooks/useOrders';
-import FilterIcon from '@mui/icons-material/FilterList';
-import Badge from '@mui/material/Badge';
-import FilterDialog from '../Components/FilterDialog';
+import Settings from '../Components/Settings';
+import FilterSettings from '../Components/FilterSettings';
+import useTranslation from '../hooks/useTranslation';
 import "./Orders.css"
 
 // Masonry >= 2.9 drops empty columns, so a few cards would stretch across the
@@ -27,8 +27,8 @@ function FixedColumnsMasonry({ columnsCount = 1, children }) {
 
 export default function OrderPage() {
 
+  const { t } = useTranslation()
   const [dontShowAll, setDontShowAll] = useState(true)
-  const [dialogOpen, setDialogOpen] = useState(false)
   const [filteredProductGroup, setFilteredProductGroup] = useState([])
   const [productGroupInitialized, setProductGroupInitialized] = useState(false)
 
@@ -50,20 +50,18 @@ export default function OrderPage() {
   })
 
   const [openErrorDialog, setOpenErrorDialog] = useState(false)
-  const [openSnackbar, setOpenSnackbar] = useState(false)
-  const [snackbarMessage, setSnackbarMessage] = useState("")
 
-  function handleClose() {
-    setOpenSnackbar(false)
+  // Only after the first response, an empty list while loading isn't "no orders"
+  const noOrders = initialized && numOfOrders < 1
+  const [snackbarDismissed, setSnackbarDismissed] = useState(false)
+  // Show the hint again the next time the list runs empty
+  if (!noOrders && snackbarDismissed) {
+    setSnackbarDismissed(false)
   }
 
-  useEffect(() => {
-    if (!initialized || numOfOrders < 1) return
-
-    setSnackbarMessage("No orders available")
-    setOpenSnackbar(true)
-
-  }, [numOfOrders, initialized])
+  function handleClose() {
+    setSnackbarDismissed(true)
+  }
 
   return (
     <>
@@ -80,14 +78,14 @@ export default function OrderPage() {
             vertical: 'bottom',
             horizontal: 'center'
           }}
-          open={openSnackbar}
+          open={noOrders && !snackbarDismissed}
           autoHideDuration={6000}
           onClose={handleClose}
-          message={snackbarMessage}
+          message={t('orders.noOrders')}
           action={
             <React.Fragment>
               <Button color="secondary" size="small" onClick={() => setOpenErrorDialog(true)}>
-                Details
+                {t('common.details')}
               </Button>
               <IconButton size="small" aria-label="close" color="inherit" onClick={handleClose}>
                 <CloseIcon fontSize="small" />
@@ -99,14 +97,9 @@ export default function OrderPage() {
           open={openErrorDialog}
           setOpen={setOpenErrorDialog} />
       </div>
-      <section className="float-right">
-        <IconButton className="glass-button" aria-label="filter" onClick={() => setDialogOpen(true)}>
-          <Badge color="secondary" variant="dot" overlap="rectangular" invisible={dontShowAll && productIds.length === filteredProductGroup.length}>
-            <FilterIcon />
-          </Badge>
-        </IconButton>
-        <FilterDialog dontShowAll={dontShowAll} setDontShowAll={setDontShowAll} filteredProductGroup={filteredProductGroup} setFilteredProductGroup={setFilteredProductGroup} open={dialogOpen} onClose={() => setDialogOpen(false)} productGroups={productGroups} />
-      </section>
+      <Settings badge={!dontShowAll || productIds.length !== filteredProductGroup.length}>
+        <FilterSettings dontShowAll={dontShowAll} setDontShowAll={setDontShowAll} filteredProductGroup={filteredProductGroup} setFilteredProductGroup={setFilteredProductGroup} productGroups={productGroups} />
+      </Settings>
     </>
   );
 }

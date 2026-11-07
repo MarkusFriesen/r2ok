@@ -1,8 +1,14 @@
 const {getCoupons} = require('./coupons')
 const {toggleOrder, getTablesWithOrders, getLastError, getProductsToProductGroup, getProducts} = require('./orders')
 const {getAllCoupons} = require('./synchronizer.js')
+const translations = require('./translations.json')
 
 module.exports = function (app) {
+  // All languages at once, the file is small and switching stays instant
+  app.get('/api/translations', (_, res) => {
+    res.send(translations)
+  })
+
   app.get('/api/orders', (_, res) => {
     res.send(getTablesWithOrders())
   })
