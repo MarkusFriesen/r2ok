@@ -21,6 +21,7 @@ import FileCopy from '@mui/icons-material/FileCopy';
 import copy from 'copy-to-clipboard';
 import SearchIcon from '@mui/icons-material/Search';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import CloseIcon from '@mui/icons-material/Close';
 import Settings from '../Components/Settings';
 import useTranslation from '../hooks/useTranslation';
 import "./Coupons.css"
@@ -105,13 +106,18 @@ function Coupons() {
             <Button onClick={handleClose} color="primary">{t('common.close')}</Button>
           </DialogActions>
         </Dialog>
-        <Snackbar
-          open={showSnackbar}
-          onClose={closeSnackbar}
-          message={t('coupons.copied', { code: selectedCoupon?.identifier })}
-          autoHideDuration={3000}
-        />
       </Paper>
+      <Snackbar
+        open={showSnackbar}
+        onClose={closeSnackbar}
+        message={t('coupons.copied', { code: selectedCoupon?.identifier })}
+        autoHideDuration={3000}
+        action={
+          <IconButton size="small" aria-label="close" color="inherit" onClick={closeSnackbar}>
+            <CloseIcon fontSize="small" />
+          </IconButton>
+        }
+      />
       <Settings />
     </>
   );
