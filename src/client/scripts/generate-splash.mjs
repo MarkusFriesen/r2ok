@@ -5,27 +5,27 @@
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import sharp from 'sharp'
 import { appleSplashScreenSizes } from '@vite-pwa/assets-generator/config'
+import { badgeSvg, iconSize as badgeSourceSize } from './icon-variants.mjs'
 
 // Same misty sky the app shows behind its content (body::before in App.css)
 const background = 'public/background.svg'
 const backgroundSize = { width: 1180, height: 800 }
-const icon = 'public/icon-512.png'
+// The sun circle with the cup floats on the sky; the pale square of the full
+// icon would almost disappear against it
+const badge = badgeSvg({ shadow: true })
 const outDir = 'public/splash'
 const indexHtml = 'index.html'
-// Icon width relative to the shorter screen side
-const iconScale = 0.28
+// Badge width (circle plus shadow room) relative to the shorter screen side
+const iconScale = 0.32
 
 // Many devices share a resolution, only generate each one once
 const sizes = new Map()
 for (const size of Object.values(appleSplashScreenSizes))
   sizes.set(`${size.width}x${size.height}@${size.scaleFactor}`, size)
 
-async function roundedIcon(size) {
-  const radius = Math.round(size * 0.225)
-  const mask = Buffer.from(`<svg width="${size}" height="${size}"><rect width="${size}" height="${size}" rx="${radius}" ry="${radius}"/></svg>`)
-  return sharp(icon)
+function renderBadge(size) {
+  return sharp(Buffer.from(badge), { density: (72 * size) / badgeSourceSize })
     .resize(size, size)
-    .composite([{ input: mask, blend: 'dest-in' }])
     .png()
     .toBuffer()
 }
@@ -44,7 +44,7 @@ for (const { width, height, scaleFactor } of sizes.values()) {
     const scale = Math.max(w / backgroundSize.width, h / backgroundSize.height)
     await sharp(background, { density: 72 * scale })
       .resize(w, h, { fit: 'cover', position: 'bottom' })
-      .composite([{ input: await roundedIcon(iconSize), gravity: 'center' }])
+      .composite([{ input: await renderBadge(iconSize), gravity: 'center' }])
       .png({ compressionLevel: 9, palette: true })
       .toFile(`${outDir}/${name}`)
 

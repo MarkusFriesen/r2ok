@@ -3,22 +3,16 @@
 // - public/apple-touch-icon.png iOS home screen, full bleed (iOS rounds the corners itself)
 // - public/favicon.ico          browser tab, 16/32/48px
 // Run with `npm run icons`, then `npm run splash` so the launch images pick up the new icon.
-import { readFile, writeFile } from 'node:fs/promises'
+import { writeFile } from 'node:fs/promises'
 import sharp from 'sharp'
-
-const source = await readFile('scripts/icon.svg', 'utf8')
-const sourceSize = 512
+import { badgeSvg, iconSize, iconSvg as source } from './icon-variants.mjs'
 
 // A tab is tiny and often light: drop the pale square so the sun circle fills
 // the whole icon, drop the hairline ring and draw the cup with a thicker line
-const faviconSource = source
-  .replace(/<rect id="background"[^>]*\/>/, '')
-  .replace(/<circle id="ring"[^>]*\/>/, '')
-  .replace('viewBox="0 0 512 512"', 'viewBox="76 76 360 360"')
-  .replace(/(<g id="cup"[^>]*stroke-width=")26"/, '$140"')
+const faviconSource = badgeSvg({ strokeWidth: 40, ring: false })
 
 function render(svg, size) {
-  return sharp(Buffer.from(svg), { density: (72 * size) / sourceSize })
+  return sharp(Buffer.from(svg), { density: (72 * size) / iconSize })
     .resize(size, size)
     .png({ compressionLevel: 9 })
     .toBuffer()
