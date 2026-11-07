@@ -10,16 +10,19 @@ body {
     margin: 0;
     min-height: 100vh;
     min-height: 100dvh;
-    background-color: #eef3f7;
+    background-color: #d7e2ec;
     font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     /* No rubber band or pull-to-refresh, the app polls on its own */
     overscroll-behavior: none;
 }
 
-/* Keep content out of the notch and the home indicator (viewport-fit=cover) */
+/* Keep content out of the notch and the home indicator (viewport-fit=cover).
+   The gap above the nav is padding here instead of a margin on the nav: a margin
+   collapses through #root and body, pushing the 100vh body 12px down and making
+   an empty page scroll */
 #root {
-    padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    padding: calc(12px + env(safe-area-inset-top)) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 
 /* App chrome behaves like native controls: no text selection or long-press callout */
@@ -31,24 +34,26 @@ body {
     -webkit-touch-callout: none;
 }
 
-/* Muted backdrop for the glass surfaces, just enough tonal variation for the
-   blur to read. A fixed layer instead of background-attachment: fixed, which
-   is broken on iOS Safari */
+/* Misty sky behind the glass surfaces, colorful enough for the blur and the
+   transparency to read. Cover keeps the horizon and mountains aligned, the
+   bottom anchor crops the sky rather than the mountains on wide screens.
+   A fixed layer instead of background-attachment: fixed, which is broken on
+   iOS Safari. top/right/bottom/left instead of inset for Safari 12 */
 body::before {
     content: "";
     position: fixed;
-    inset: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
     z-index: -1;
-    background:
-        radial-gradient(60vmax 60vmax at 0% 0%, #c4d4e2 0%, transparent 55%),
-        radial-gradient(50vmax 50vmax at 100% 25%, #e0d9d1 0%, transparent 50%),
-        radial-gradient(60vmax 60vmax at 50% 110%, #cdd1dc 0%, transparent 55%);
+    background: #d7e2ec url(/background.svg) center bottom / cover no-repeat;
 }
 
 .nav {
     top: calc(12px + env(safe-area-inset-top));
     width: fit-content !important;
-    margin: calc(12px + env(safe-area-inset-top)) auto 0;
+    margin: 0 auto;
     padding: 4px;
     border-radius: 999px;
 }
@@ -60,10 +65,51 @@ body::before {
     bottom: 0;
     left: 0;
     border-radius: 999px;
-    background-color: rgba(255, 255, 255, 0.85);
-    box-shadow: inset 0 1px 0 #fff, 0 2px 10px rgba(16, 42, 67, 0.15);
+    background-color: rgba(255, 255, 255, 0.75);
+    box-shadow: inset 0 1px 0 #fff, 0 2px 10px rgba(16, 42, 67, 0.12);
     transition: transform 350ms cubic-bezier(0.34, 1.3, 0.64, 1), width 350ms cubic-bezier(0.34, 1.3, 0.64, 1);
     pointer-events: none;
+}
+
+/* Floating glass settings button, aligned with the nav pill */
+.float-right {
+    position: fixed;
+    top: calc(12px + env(safe-area-inset-top));
+    right: calc(16px + env(safe-area-inset-right));
+    z-index: 1101;
+}
+
+.float-right .glass-button {
+    width: 56px;
+    height: 56px;
+    color: #0a2433;
+    background-color: rgba(255, 255, 255, 0.35);
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.05) 70%);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85), 0 10px 40px rgba(40, 70, 110, 0.14);
+    transition: background-color 150ms, transform 120ms;
+}
+
+/* Touch screens would keep the hover style after a tap */
+@media (hover: hover) {
+    .float-right .glass-button:hover {
+        background-color: rgba(255, 255, 255, 0.55);
+    }
+}
+
+.float-right .glass-button:active {
+    transform: scale(0.95);
+}
+
+.settings-section + .settings-section {
+    margin-top: 20px;
+}
+
+.language-switcher {
+    margin-top: 8px;
+    flex-wrap: wrap;
 }
 
 /* Old Safari (iOS 12) technically has backdrop-filter, but renders the large
@@ -88,7 +134,7 @@ body::before {
     }
 
     .card .order-not-in-filter {
-        background-color: rgba(238, 243, 247, 0.6);
+        background-color: rgba(215, 226, 236, 0.6);
         pointer-events: none;
     }
 }

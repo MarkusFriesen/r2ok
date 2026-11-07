@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="800" viewBox="0 0 1180 800">
+  <!-- Misty sky: pale blue sky, warm peach horizon, blurred blue mountain layers.
+       Shown with background-size: cover, so the layers stay aligned on every screen.
+       Also used by scripts/generate-splash.mjs for the iOS launch images. -->
+  <defs>
+    <!-- Stays light down to the bottom -->
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d3e2ef"/>
+      <stop offset="0.26" stop-color="#e6ecf2"/>
+      <stop offset="0.48" stop-color="#efe0da"/>
+      <stop offset="0.61" stop-color="#f5ccba"/>
+      <stop offset="0.7" stop-color="#e9d6d2"/>
+      <stop offset="0.86" stop-color="#dbe3ee"/>
+      <stop offset="1" stop-color="#cfdcea"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="802" cy="495" r="520" gradientUnits="userSpaceOnUse"
+      gradientTransform="translate(802 495) scale(1 0.5) translate(-802 -495)">
+      <stop offset="0" stop-color="#ffd6c0" stop-opacity="0.75"/>
+      <stop offset="0.7" stop-color="#ffd6c0" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="mist-far" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0.65" stop-color="#f2e8ec" stop-opacity="0"/>
+      <stop offset="0.75" stop-color="#f2e8ec" stop-opacity="0.6"/>
+      <stop offset="0.85" stop-color="#f2e8ec" stop-opacity="0"/>
+    </linearGradient>
+    <!-- Fog band that cuts through the front range -->
+    <linearGradient id="mist-near" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0.87" stop-color="#e2ecf6" stop-opacity="0"/>
+      <stop offset="0.94" stop-color="#e2ecf6" stop-opacity="0.7"/>
+      <stop offset="1" stop-color="#e2ecf6" stop-opacity="0.35"/>
+    </linearGradient>
+    <!-- Mountain fills fade out downwards, so their lower part does not turn the bottom blue -->
+    <linearGradient id="far-fill" gradientUnits="userSpaceOnUse" x1="0" y1="370" x2="0" y2="640">
+      <stop offset="0" stop-color="#c2c8dc"/>
+      <stop offset="1" stop-color="#c2c8dc" stop-opacity="0.2"/>
+    </linearGradient>
+    <!-- Front range: stays dark a bit further down, then fades out below the fog -->
+    <linearGradient id="mid-fill" gradientUnits="userSpaceOnUse" x1="0" y1="450" x2="0" y2="640">
+      <stop offset="0" stop-color="#9fb5d4" stop-opacity="0.9"/>
+      <stop offset="0.35" stop-color="#9fb5d4" stop-opacity="0.75"/>
+      <stop offset="1" stop-color="#9fb5d4" stop-opacity="0"/>
+    </linearGradient>
+    <!-- The farther away, the blurrier. Paths reach past the edges so the blur does not fade out at the borders -->
+    <filter id="blur-far" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="12"/></filter>
+    <filter id="blur-mid" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="8"/></filter>
+  </defs>
+  <rect width="1180" height="800" fill="url(#sky)"/>
+  <rect width="1180" height="800" fill="url(#glow)"/>
+  <!-- Mountains sit low and translucent, so the sky stays light and shows through -->
+  <g transform="translate(0 120)">
+    <path filter="url(#blur-far)" opacity="0.55" fill="url(#far-fill)" d="M-60 480 L0 470 C 80 450, 150 420, 230 380 C 270 360, 300 362, 340 385 C 400 420, 470 440, 560 440 C 650 440, 700 420, 760 400 C 800 386, 830 390, 880 410 C 960 440, 1060 430, 1180 450 L1240 456 L1240 880 L-60 880 Z"/>
+  </g>
+  <rect width="1180" height="800" fill="url(#mist-far)"/>
+  <g transform="translate(0 170)">
+    <path filter="url(#blur-mid)" opacity="0.55" fill="url(#mid-fill)" d="M-60 566 L0 560 C 120 540, 200 500, 300 470 C 360 452, 420 470, 500 500 C 580 528, 660 520, 740 495 C 800 476, 860 470, 940 490 C 1020 510, 1100 520, 1180 515 L1240 514 L1240 880 L-60 880 Z"/>
+  </g>
+  <rect width="1180" height="800" fill="url(#mist-near)"/>
+</svg>

@@ -2,15 +2,19 @@ import { createTheme, alpha } from '@mui/material/styles';
 
 export const navy = '#0a2433';
 
+// Light top sheen of the glass, fading towards the bottom
+export const glassSheen = 'linear-gradient(180deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.05) 70%)';
+
 // Frosted "liquid glass" surface: translucent fill, blurred backdrop,
-// bright hairline border with a top highlight and a soft wide shadow
-export const glass = (opacity = 0.55) => ({
+// bright hairline border with a top highlight and a soft wide shadow.
+// Kept quite transparent so the misty sky behind it shows through
+export const glass = (opacity = 0.3) => ({
   backgroundColor: `rgba(255, 255, 255, ${opacity})`,
-  backgroundImage: 'none',
-  backdropFilter: 'blur(24px) saturate(180%)',
-  WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+  backgroundImage: glassSheen,
+  backdropFilter: 'blur(20px) saturate(160%)',
+  WebkitBackdropFilter: 'blur(20px) saturate(160%)',
   border: '1px solid rgba(255, 255, 255, 0.6)',
-  boxShadow: `inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 10px 40px ${alpha(navy, 0.12)}`,
+  boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.85), 0 10px 40px rgba(40, 70, 110, 0.14)',
 });
 
 const theme = createTheme({
@@ -33,7 +37,8 @@ const theme = createTheme({
     },
     text: {
       primary: navy,
-      secondary: alpha(navy, 0.6),
+      // Slightly stronger than usual, the surfaces are see-through
+      secondary: alpha(navy, 0.68),
     },
   },
   shape: {
@@ -101,12 +106,12 @@ const theme = createTheme({
           fontSize: '1rem',
           fontWeight: 600,
           textTransform: 'none',
-          color: alpha(navy, 0.65),
+          color: alpha(navy, 0.7),
           transition: 'background-color 200ms, box-shadow 200ms, color 200ms',
           '&.Mui-selected, &.Mui-selected:hover': {
             color: navy,
-            backgroundColor: 'rgba(255, 255, 255, 0.85)',
-            boxShadow: `inset 0 1px 0 #fff, 0 2px 10px ${alpha(navy, 0.15)}`,
+            backgroundColor: 'rgba(255, 255, 255, 0.75)',
+            boxShadow: `inset 0 1px 0 #fff, 0 2px 10px ${alpha(navy, 0.12)}`,
           },
         },
       },

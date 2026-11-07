@@ -36,7 +36,8 @@
     "deploy": "rm -r ../server/public && cp -r ./dist ../server/public",
     "deployW": "(if exist \"..\\server\\public\" rmdir ..\\server\\public /Q/S) && xcopy dist ..\\server\\public /E/I/Y/Q",
     "lint": "oxlint",
-    "splash": "node scripts/generate-splash.mjs"
+    "splash": "node scripts/generate-splash.mjs",
+    "icons": "node scripts/generate-icons.mjs"
   },
   "browserslist": {
     "production": [

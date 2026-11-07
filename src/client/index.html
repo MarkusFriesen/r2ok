@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#eef3f7" />
+    <meta name="theme-color" content="#d3e2ef" />
     <meta name="description" content="Ready2Order Kitchen" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -58,14 +58,14 @@
     <!-- App shell placeholder, shown until React replaces the content of #root -->
     <style>
       /* On body, not html, so it still propagates to the canvas below the backdrop in App.css */
-      body { margin: 0; background-color: #eef3f7; }
+      body { margin: 0; background: #d7e2ec url(/background.svg) center bottom / cover no-repeat; min-height: 100vh; }
       .boot { padding: calc(12px + env(safe-area-inset-top)) max(15px, env(safe-area-inset-right)) 0 max(15px, env(safe-area-inset-left)); }
       .boot-nav { width: 228px; height: 56px; margin: 0 auto 30px; border-radius: 999px; }
       .boot-cards { display: grid; grid-template-columns: repeat(var(--cols, 1), 1fr); gap: 30px; align-items: start; }
       .boot-nav, .boot-cards > div {
-        background: rgba(255, 255, 255, 0.55) linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, 0.6) 50%, transparent 70%) 0 0 / 200% 100%;
+        background: rgba(255, 255, 255, 0.3) linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, 0.6) 50%, transparent 70%) 0 0 / 200% 100%;
         border: 1px solid rgba(255, 255, 255, 0.6);
-        box-shadow: 0 10px 40px rgba(10, 36, 51, 0.08);
+        box-shadow: 0 10px 40px rgba(40, 70, 110, 0.1);
         animation: boot-shimmer 1.4s linear infinite;
       }
       .boot-cards > div { height: 260px; border-radius: 24px; }

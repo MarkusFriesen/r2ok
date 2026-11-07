@@ -1,12 +1,14 @@
 // Generates the iOS launch images (iOS ignores the manifest for splash screens
 // and only uses an apple-touch-startup-image that matches the device exactly)
 // and writes the matching <link> tags into index.html.
-// Run with `npm run splash` after changing the icon or background color.
+// Run with `npm run splash` after changing the icon or the background.
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import sharp from 'sharp'
 import { appleSplashScreenSizes } from '@vite-pwa/assets-generator/config'
 
-const background = '#eef3f7'
+// Same misty sky the app shows behind its content (body::before in App.css)
+const background = 'public/background.svg'
+const backgroundSize = { width: 1180, height: 800 }
 const icon = 'public/icon-512.png'
 const outDir = 'public/splash'
 const indexHtml = 'index.html'
@@ -38,7 +40,10 @@ for (const { width, height, scaleFactor } of sizes.values()) {
     const iconSize = Math.round(Math.min(w, h) * iconScale)
     const name = `${landscape ? 'landscape' : 'portrait'}-${w}x${h}.png`
 
-    await sharp({ create: { width: w, height: h, channels: 3, background } })
+    // Rasterize at the target resolution, then crop like `background-size: cover` anchored at the bottom
+    const scale = Math.max(w / backgroundSize.width, h / backgroundSize.height)
+    await sharp(background, { density: 72 * scale })
+      .resize(w, h, { fit: 'cover', position: 'bottom' })
       .composite([{ input: await roundedIcon(iconSize), gravity: 'center' }])
       .png({ compressionLevel: 9, palette: true })
       .toFile(`${outDir}/${name}`)
