@@ -12,13 +12,19 @@ import DoneAllIcon from '@mui/icons-material/DoneAll';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import EmojiFoodBeverageIcon from '@mui/icons-material/EmojiFoodBeverage';
 import TakeoutDiningIcon from '@mui/icons-material/TakeoutDining';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import CircularProgress from '@mui/material/CircularProgress';
+import Collapse from '@mui/material/Collapse';
+import ButtonBase from '@mui/material/ButtonBase';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import axios from 'axios'
+import useItemPlacement, { moveDelayMs } from '../hooks/useItemPlacement';
 import './Order.css'
 
 const dateOptions = { month: 'short', day: 'numeric' };
 const timeOptions = { hour: 'numeric', minute: 'numeric' };
 const language = window.navigator.language;
+
 // To-go cards start glowing once the customer has waited this long
 const togoOverdueMs = 15 * 60000;
 
@@ -54,6 +60,9 @@ export default function Order(props) {
   const { name, orders = [], updateOrders, created, togo } = props
   const [changingOrderId, setChaningOrderId] = useState(-1)
   const [now, setNow] = useState(() => Date.now())
+  const [showDone, setShowDone] = useState(false)
+  const { placementOf, isMoving } = useItemPlacement(orders)
+  const transitionMs = useMediaQuery('(prefers-reduced-motion: reduce)') ? 0 : 600
 
   useEffect(() => {
     const intervalId = setInterval(() => setNow(Date.now()), 5000)
@@ -71,7 +80,7 @@ export default function Order(props) {
     setChaningOrderId(-1)
   }
 
-  const items = orders.map(order => {
+  const renderItem = (order) => {
     const { name, comment, status, id, created, inFilter, quantity } = order
     let value = 0;
 
@@ -84,16 +93,36 @@ export default function Order(props) {
 
     const labelId = `checkbox-list-label-${id}`;
     return (
-      <ListItemButton key={id} dense onClick={ToggleStatus(id)} disabled={changingOrderId === id} className={status === 2 ? "order-list-item-padding order-done" : "order-list-item-padding"} >
+      <ListItemButton dense onClick={ToggleStatus(id)} disabled={changingOrderId === id} className={status === 2 ? "order-list-item-padding order-done" : "order-list-item-padding"} >
         <ListItemIcon>
           {getCircularProgress(value, status, "loading", changingOrderId === id)}
           {getStatusIcon(status)}
         </ListItemIcon>
         <ListItemText id={labelId} primary={quantity > 1 ? `${quantity}× ${name}` : name} secondary={comment} />
         <section className={inFilter ? "" : "order-not-in-filter"} />
+        {isMoving(order) && (
+          <span
+            className={status === 2 ? "order-move-progress down" : "order-move-progress up"}
+            style={{ animationDuration: `${moveDelayMs}ms` }} />
+        )}
       </ListItemButton>
     );
-  })
+  }
+
+  // Every item is rendered in both sections, collapsing in one while expanding
+  // in the other makes it look like it slides from one to the other
+  const renderGroup = (section) => (
+    <List className="order-group" disablePadding>
+      {orders.map(order => (
+        <Collapse key={order.id} in={placementOf(order) === section} timeout={transitionMs} unmountOnExit>
+          {renderItem(order)}
+        </Collapse>
+      ))}
+    </List>
+  )
+
+  const activeCount = orders.filter(o => placementOf(o) === 'active').length
+  const doneCount = orders.length - activeCount
 
   const timestamp = new Date(created)
   const open = orders.some(o => o.status !== 2)
@@ -115,9 +144,22 @@ export default function Order(props) {
           }}
         />
         <CardContent>
-          <List className="order-list">
-            {items}
-          </List>
+          <Collapse in={activeCount > 0} timeout={transitionMs}>
+            {renderGroup('active')}
+          </Collapse>
+          <Collapse in={doneCount > 0} timeout={transitionMs}>
+            <section className="order-done-section">
+              <ButtonBase className="order-done-header" onClick={() => setShowDone(!showDone)} aria-expanded={showDone}>
+                <DoneAllIcon className="order-done-icon" />
+                <span className="order-done-label">Completed</span>
+                <span className="order-done-count">{doneCount}</span>
+                <ExpandMoreIcon fontSize="small" className={showDone ? "order-done-chevron open" : "order-done-chevron"} />
+              </ButtonBase>
+              <Collapse in={showDone} timeout={transitionMs}>
+                {renderGroup('done')}
+              </Collapse>
+            </section>
+          </Collapse>
         </CardContent>
       </Card>
     </div>

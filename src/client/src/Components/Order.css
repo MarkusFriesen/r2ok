@@ -64,7 +64,9 @@
     }
 }
 
-.card .order-done {
+/* Dim the content only, so the move progress bar keeps its full color */
+.card .order-done > .MuiListItemIcon-root,
+.card .order-done > .MuiListItemText-root {
     opacity: 0.5;
 }
 
@@ -81,8 +83,143 @@
     -webkit-backdrop-filter: blur(1.5px) grayscale(1);
 }
 
-.card .order-list {
-    margin: 0 -5px;
+/* Apple style grouped list: one rounded group per section, rows separated by hairlines */
+.card .order-group {
+    position: relative;
+    overflow: hidden;
+    border-radius: 14px;
+    background-color: rgba(255, 255, 255, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+/* Every row draws a hairline on top, the first one is clipped by the group */
+.card .order-group > :first-child {
+    margin-top: -1px;
+}
+
+.card .order-group .order-list-item-padding::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    /* Row padding + icon width, so it lines up with the text */
+    left: 46px;
+    right: 14px;
+    height: 1px;
+    background-color: rgba(10, 36, 51, 0.14);
+    transform: scaleY(0.5);
+    transform-origin: top;
+}
+
+.card .order-group .order-list-item-padding {
+    margin: 0;
+    padding: 9px 10px;
+    border-radius: 0;
+}
+
+.card .order-group .order-not-in-filter {
+    border-radius: 0;
+}
+
+/* Countdown until a toggled item slides into the other section, lines up with the hairline */
+.card .order-move-progress {
+    position: absolute;
+    bottom: 3px;
+    left: 46px;
+    right: 14px;
+    height: 3px;
+    border-radius: 999px;
+    transform-origin: left;
+    animation-name: order-move-progress;
+    animation-timing-function: linear;
+    animation-fill-mode: forwards;
+    pointer-events: none;
+}
+
+.card .order-move-progress.down {
+    background-color: #2fb67c;
+}
+
+.card .order-move-progress.up {
+    background-color: #0a2433;
+}
+
+@keyframes order-move-progress {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+}
+
+/* MUI pads the last CardContent extra deep */
+.card .MuiCardContent-root:last-child {
+    padding-bottom: 16px;
+}
+
+/* Header and completed items share one group, like a disclosure row */
+.card .order-done-section {
+    margin-top: 10px;
+    overflow: hidden;
+    border-radius: 14px;
+    background-color: rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+.card .order-done-section .order-group {
+    background-color: transparent;
+    border: 0;
+    border-radius: 0;
+}
+
+/* Keep the hairline between the header and the first completed item */
+.card .order-done-section .order-group > :first-child {
+    margin-top: 0;
+}
+
+.card .order-done-header {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 9px 10px;
+    font: inherit;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: rgba(10, 36, 51, 0.6);
+}
+
+@media (hover: hover) {
+    .card .order-done-header:hover {
+        background-color: rgba(255, 255, 255, 0.5);
+    }
+}
+
+/* Same width as the item icons, so the label lines up with the item text */
+.card .order-done-icon {
+    flex-shrink: 0;
+    /* 2 + 20 + 14 = 36px, centered on the 24px item icons */
+    font-size: 1.25rem;
+    margin: 0 14px 0 2px;
+}
+
+.card .order-done-label {
+    flex: 1;
+    text-align: left;
+}
+
+.card .order-done-count {
+    margin-right: 4px;
+    font-variant-numeric: tabular-nums;
+}
+
+.card .order-done-chevron {
+    transition: transform 250ms ease;
+}
+
+.card .order-done-chevron.open {
+    transform: rotate(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .card .order-done-chevron {
+        transition: none;
+    }
 }
 
 .loading {
